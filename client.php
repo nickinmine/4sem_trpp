@@ -19,14 +19,10 @@
 	}
 
 	if ($operation == "find") {
-		$passport = $_POST["passport"];
-		
-		if ($passport != "") {
-			$mysqli = get_connection();
-        		$result = $mysqli->query("select * from clients where passport like \"%" . $passport . "%\"");
-        		foreach ($result as $res) {
-				echo "Клиент с паспортом " . $res["passport"] . " имеет ID " . $res["id"];
-			}
+		$mysqli = get_connection();
+       		$result = $mysqli->query("select * from clients where passport like \"%" . $_POST["passport"] . "%\"");
+    		foreach ($result as $res) {
+			echo "Клиент с паспортом " . $res["passport"] . " имеет ID " . $res["id"];
 		}
 	}
 ?>

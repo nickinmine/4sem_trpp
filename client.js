@@ -14,6 +14,10 @@ function createClient() {
 		alert("Заполните все поля");
 		return;
 	}
+	if (!/^[^@]+@[^@]+\.\w+^/.test(getValueById("create_client::email"))) {
+		alert("Некорректный ввод электронной почты.\nПочта вводится в формате \"email@email.com\"");
+		return;
+	}
 	if (!/^[0-9]{4} [0-9]{6}$/.test(getValueById("create_client::passport"))) {
 		alert("Некорректный ввод паспорта.\nПаспорт вводится в формате \"XXXX XXXXXX\"");
 		return;
@@ -37,6 +41,11 @@ function createClient() {
 }
 
 function findClientId() {
+	if (!/^[0-9]{4} [0-9]{6}$/.test(getValueById("find_client_id::passport"))) {
+		alert("Некорректный ввод паспорта.\nПаспорт вводится в формате \"XXXX XXXXXX\"");
+		return;
+	}
+
 	var request = new XMLHttpRequest();
 	request.open('POST', "client.php", true);
 	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
