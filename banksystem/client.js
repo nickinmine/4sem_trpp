@@ -6,12 +6,16 @@ function createClient() {
 		alert("Заполните все поля");
 		return;
 	}
-	if (!/^[^@]+@[^@]+\.\w+^/.test(document.getElementById("create_client::email").value)) {
+	if (!/^[^@]+@[^@]+\.\w+$/.test(document.getElementById("create_client::email").value)) {
 		alert("Некорректный ввод электронной почты.\nПочта вводится в формате \"email@email.com\"");
 		return;
 	}
 	if (!/^[0-9]{4} [0-9]{6}$/.test(document.getElementById("create_client::passport").value)) {
 		alert("Некорректный ввод паспорта.\nПаспорт вводится в формате \"XXXX XXXXXX\"");
+		return;
+	}
+	if (!/^\+?[0-9]{6,11}$/.test(document.getElementById("create_client::phone").value)) {
+		alert("Некорректный ввод номера телефона.");
 		return;
 	}
 	                                              
@@ -29,7 +33,8 @@ function createClient() {
 				+ "&email=" + encodeURIComponent(document.getElementById("create_client::email").value)
 				+ "&birthdate=" + encodeURIComponent(document.getElementById("create_client::birthdate").value)
 				+ "&passport=" + encodeURIComponent(document.getElementById("create_client::passport").value)
-				+ "&address=" + encodeURIComponent(document.getElementById("create_client::address").value);
+				+ "&address=" + encodeURIComponent(document.getElementById("create_client::address").value)
+				+ "&phone=" + encodeURIComponent(document.getElementById("create_client::phone").value);
 	request.send(data);
 }
 

@@ -97,6 +97,30 @@ function depositAccount() {
 	request.send(data);
 }
 
+function findClientIdByPhone() {
+	if (!/^\+?[0-9]{6,11}$/.test(document.getElementById("transaction::phone").value)) {
+		alert("Некорректный ввод номера телефона.");
+		return;
+	}
+
+	var request = new XMLHttpRequest();
+	request.open('POST', "account.php", true);
+	request.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	request.responseType = 'text';
+
+	request.onload = function() {
+		if (request.response != "") {
+	  		//alert(request.response);
+			document.getElementById("transaction::credit_client_info").innerHTML = request.response;
+		}
+		else document.getElementById("transaction::credit_client_info").innerHTML = "Клиент не найден";
+	};
+
+	var data = "op=findphone" + "&phone=" + encodeURIComponent(document.getElementById("transaction::phone").value);
+	request.send(data);
+}
+
+
 function transaction() {
 	if (document.getElementById("transaction::credit_accountnum_0").selected) {
         	alert("Не выбран счет перевода.");
@@ -124,7 +148,17 @@ function transaction() {
 	};
 
 	var data = window.location.search + "&op=transaction"; 
-	
+	var cnt = 1;          
+	while (true) {
+		if (document.getElementById("deposit_account::accountnum_" + String(cnt)).selected) {
+			data += "&accountnum=" + document.getElementById("deposit_account::accountnum_" + String(cnt)).value;
+			break;
+		}
+		cnt++;
+	} 
+	data += "&sum=" + document.getElementById("deposit_account::sum").value;
+        
+
 	alert(data);	
             
 	request.send(data);

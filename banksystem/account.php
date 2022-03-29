@@ -60,4 +60,13 @@
                 	
 		echo $stmt->execute();
 	}
+
+	if ($operation == "findphone") {
+		$mysqli = get_sql_connection();
+       		$result = $mysqli->query("SELECT * FROM clients WHERE phone = \"" . $_POST["phone"] . "\"");
+    		foreach ($result as $res) {
+			echo $res["name"];
+			break;
+		}
+	}
 ?>

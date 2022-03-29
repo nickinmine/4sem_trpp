@@ -30,6 +30,7 @@
 	<div><label>Дата рождения<input type="date" required="required" id="create_client::birthdate"></label></div>
 	<div><label>Паспорт<input pattern="^[0-9]{4} [0-9]{6}$" required="required" id="create_client::passport"></label></div>
         <div><label>Адрес<input type="text" required="required" id="create_client::address"></label></div>
+	<div><label>Телефон<input type="text" required="required" id="create_client::phone"></label></div>
 	<div><input type="button" value="Создать" onclick="createClient()"></div>
 </form>
 

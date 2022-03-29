@@ -6,14 +6,15 @@
 	if ($operation == "create") {
 		$mysqli = get_sql_connection();
 
-		$stmt = $mysqli->prepare("INSERT INTO clients(name, email, birthdate, passport, address) values (?, ?, ?, ?, ?)");
+		$stmt = $mysqli->prepare("INSERT INTO clients(name, email, birthdate, passport, address, phone) values (?, ?, ?, ?, ?, ?)");
 		
 		$name = $_POST["name"];
 		$mail = $_POST["email"];
 		$date = $_POST["birthdate"];
 		$pass = $_POST["passport"];
 		$addr = $_POST["address"];
-                $stmt->bind_param("sssss", $name, $mail, $date, $pass, $addr);
+		$phne = $_POST["phone"];
+                $stmt->bind_param("ssssss", $name, $mail, $date, $pass, $addr, $phne);
 		
 		echo $stmt->execute();
 	}

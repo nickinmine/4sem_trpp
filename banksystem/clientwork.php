@@ -93,7 +93,7 @@
 	<div><input type="button" value="Пополнить" onclick="depositAccount()"></div>
 </form>
 
-<div>Перевод средств со счета на счет (в пределах счетов текущего клиента)</div>
+<div>Перевод средств со счета на счет (в пределах одной валюты)</div>
 <form id = "transaction">
 	<div>Счет перевода<select form="transaction" required>
 		<option id = "transaction::credit_accountnum_0" selected></option>
@@ -113,24 +113,12 @@
 		}                
 		?>
 	</select></div>
-	<div>Пополняемый счет<select form="transaction" required>
-		<option id = "transaction::debit_accountnum_0" selected></option>
-		<?php           
-		$mysqli = get_sql_connection();
-		$result = $mysqli->query('SELECT * FROM account WHERE idclient = "' . $_GET["idclient"] . '"');
-		$cnt = 1;
-		foreach ($result as $res) {
-			if (!$res["closed"]) {
-				echo '<option id=transaction::debit_accountnum_"' . $cnt++ . 
-					'" value = "' . $res["accountnum"] . '">Счет №' . $res["accountnum"];
-				$currency = $mysqli->query('SELECT * FROM currency WHERE code = ' . $res["currency"]);
-				foreach ($currency as $cur) {
-					echo ': валюта ' . $cur["name"];	
-				}
-			}			
-		}                
-		?>
-	</select></div>
+	<div>
+		<label>Телефон<input type="text" required="required" id="transaction::phone"></label>
+		<input type="button" value="Поиск" onclick="findClientIdByPhone()">
+		<span id="transaction::credit_client_info" value="12345"></span>
+		
+	</div>
 	<div><label>Сумма пополнения<input type="number" required="required" id="deposit_account::sum"></label></div>
 	<div><input type="button" value="Перевести" onclick="transaction()"></div>
 </form>	
