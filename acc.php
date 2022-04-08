@@ -1,8 +1,12 @@
 <?php
-	session_start();
-	if (!$_SESSION['user']) {
-		header('Location: /');
-	}
+    session_start();
+    if (!$_SESSION['user']) {
+        header('Location: /');
+    }
+    if ($_SESSION['user']['role'] != 'admin' & $_SESSION['user']['role'] != 'accountant') {
+        header('Location: /main.php');
+        $_SESSION['message'] = 'Отказано в доступе: несоответствие уровня доступа.';
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,10 +16,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <title>Главная</title>
+    <title>Бухгалтер</title>
 </head>
 <body>
-<header>
+<header class="header">
     <div class="header-container">
         <div class="header-menu">
             <div class="subbutton" onclick="document.location.href='main.php'">Главная</div>
@@ -32,12 +36,6 @@
         </div>
     </div>
 </header>
-<div class="access-error message">
-    <?php
-        echo $_SESSION['message'];
-        unset($_SESSION['message']);
-    ?>
-</div>
 <main>
     <p>Здесь пока ничего нет...</p>
 

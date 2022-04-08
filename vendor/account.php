@@ -1,11 +1,11 @@
 <?php
-	require "lib.php";	
+	session_start();
+	require "lib.php";
 
 	$operation = $_POST["op"];
 	
 	if ($operation == "create") {
 		$mysqli = get_sql_connection();
-
 		$stmt = $mysqli->prepare("INSERT INTO account(idclient, accountnum, currency, descript, closed) values (?, ?, ?, ?, ?)");
 		
 		$idclient = $_POST["idclient"];
@@ -21,26 +21,26 @@
 	if ($operation == "check") {
 		$mysqli = get_sql_connection();
 
-		$result = $mysqli->query('SELECT * FROM balance WHERE account = "' . $_POST["accountnum"] . '"');
+		$result = $mysqli->query('SELECT * FROM balance WHERE account = ' . $_POST["accountnum"]);
 		$sum = 0.00;
 		foreach ($result as $res) {
 			$sum = $res["sum"];
 		}
 
-		$result = $mysqli->query('SELECT * FROM operations WHERE db = "' . $_POST["accountnum"] . '"');
-		foreach ($result as $res) {
-			if ($res) {
-				$sum -= $res["sum"];
-			}
-		}
+		#$result = $mysqli->query('SELECT * FROM operations WHERE db = ' . $_POST["accountnum"]);
+		#foreach ($result as $res) {
+		#	if ($res) {
+		#		$sum -= $res["sum"];
+		#	}
+		#}
 		 
-		$result = $mysqli->query('SELECT * FROM operations WHERE cr = "' . $_POST["accountnum"] . '"');
-		foreach ($result as $res) {
-			if ($res) {
-				$sum += $res["sum"];
-			}
-		}
-		echo $sum;	
+		#$result = $mysqli->query('SELECT * FROM operations WHERE cr = ' . $_POST["accountnum"]);
+		#foreach ($result as $res) {
+		#	if ($res) {
+		#		$sum += $res["sum"];
+		#	}
+		#}
+		echo $sum;
 	}
 
 	if ($operation == "deposit") {

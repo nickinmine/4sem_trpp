@@ -1,0 +1,80 @@
+*{
+    padding:0;
+    margin:0;
+    border:0;
+    font-family: 'Montserrat', sans-serif;
+}
+main{
+    margin-top: 130px;
+}
+header{
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    position: fixed;
+    top: 0;
+    background-color: #c0dbee;
+}
+form{
+    width:35%;
+    margin:0 auto;
+    background-color: #eeeeee;
+    padding:30px 0;
+}
+input{
+    display:block;
+    align-content: start;
+    width: 50%;
+    border-bottom:1px solid #e3e3e3;
+    padding:5px 10px;
+    margin:0px auto;
+    margin-top: 5px;
+    margin-bottom: 15px;
+}
+.button:hover{background-color: #2f6fc2;}
+input[type="submit"]{
+    width: 19%;
+    margin-top: 15px;
+    color:#fbfafd;
+    background-color: #88b4d9;
+    cursor:pointer;
+    position: center;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    border-radius:2px;
+    padding:0 8px;
+}
+label{
+    margin-left:23.5%;
+    margin-top: 10px;
+}
+.access-error{margin-top: 100px;}
+.message{color:red;}
+.form-name>p{
+    text-align: center;
+    font: inherit;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+.form{
+    padding-bottom: 20px;
+}
+.form-content>p,
+.form-content>input,	
+.form-content>label{
+    font-size: inherit;
+    text-align: center;
+}
+.client-info{
+    margin-bottom:10px;
+}
+.client-info>p{
+    text-align: center;
+    font-size: inherit;
+    font-family: inherit;
+}
+.select-block{
+    text-align: center;
+    margin-bottom: 10px;
+}
