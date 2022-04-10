@@ -6,7 +6,7 @@
 	
 	if ($operation == "create") {
 		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare("INSERT INTO account(idclient, accountnum, currency, descript, closed) values (?, ?, ?, ?, ?)");
+		$stmt = $mysqli->prepare("INSERT INTO account (idclient, accountnum, currency, descript, closed) VALUES (?, ?, ?, ?, ?)");
 		
 		$idclient = $_POST["idclient"];
 		$currency = $_POST["currency"];
