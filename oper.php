@@ -55,26 +55,37 @@
 		<form action="vendor/create_client.php" method="POST">
 			<label>Фамилия, имя, отчество</label>
 			<label><input type="text" required="required" name="name" placeholder="Иванов Иван Иванович"></label>
+
 			<label>Телефон</label>
-			<label><input type="tel" required="required" name="phone" placeholder="Номер телефона"></label>
+			<label><input type="tel" required="required" name="phone" placeholder="+78005553535"></label>
+
 			<label>Номер паспорта</label>
-			<label><input pattern="^[0-9]{4} [0-9]{6}$" required="required" name="passport" placeholder="Серия и номер"></label>			
+			<label><input pattern="^[0-9]{4} [0-9]{6}$" required="required" name="passport" placeholder="Серия и номер"></label>
+			
 			<label>Кем выдан</label>
 			<label><input type="text" name="passgiven" placeholder="Название подразделения"></label>
+
 			<label>Код подразделения</label>
 			<label><input pattern="^([0-9]{3}\-[0-9]{3}|)$" name="passcode" placeholder="000-000"></label>
+
 			<label>Дата выдачи</label>
 			<label><input type="date" name="passdate"></label>
+
 			<label>Пол</label>
 			<label><input pattern="^[МЖ]$" name="sex" placeholder="М/Ж"></label>
+
 			<label>Дата рождения</label>
 			<label><input type="date" name="birthdate"></label>
+
 			<label>Место рождения</label>
 			<label><input type="text" name="birthplace" placeholder="Регион, город"></label> 
+
 			<label>Адрес</label>
-			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира"></label>    			
+			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира"></label> 
+   			
 			<label>Электронная почта</label>
 			<label><input type="email" name="email" placeholder="example@email.com"></label>  
+
 			<input class="button" type="submit" value="Создать">     
 			<label class="message"><?php
                 		echo $_SESSION['message'];

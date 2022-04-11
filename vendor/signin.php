@@ -5,11 +5,14 @@
 
 	$login = $_POST['login'];
 	$pass = md5($_POST['pass']);
-	$connect = get_sql_connection();
-	$check = mysqli_query($connect, "SELECT e.*, r.descript FROM employee e LEFT JOIN emproles r ON e.role = r.role " .  
-					"WHERE login = '$login' AND password = '$pass'");
+	$mysqli = get_sql_connection();
+	$stmt = $mysqli->prepare("SELECT e.*, r.descript FROM employee e LEFT JOIN emproles r ON e.role = r.role " .  
+					"WHERE login = ? AND password = ?");
+	$stmt->bind_param("ss", $login, $pass);
+	$stmt->execute();
+	$check = $stmt->get_result();
 	if (mysqli_num_rows($check) > 0) {	
-		$user = mysqli_fetch_assoc($check);
+		$user = $check->fetch_assoc();
 		$_SESSION['user'] = [
 			"login" => $user['login'],
 			"name" => $user['name'],

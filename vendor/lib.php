@@ -3,7 +3,7 @@
 		session_start();
 		mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);  // отладочный вывод
 		//if (!array_key_exists("connection", $_SESSION)) {
-			$_SESSION["connection"] = new mysqli("localhost", "root", "", "bankbase");
+		$_SESSION["connection"] = new mysqli("localhost", "root", "", "bankbase");
 		//}
 		return $_SESSION["connection"];
 	}
@@ -23,9 +23,19 @@
 	}
 
 	function generate_accountnum($acc2p, $currency) {
+		$stracc2p = "'" . $acc2p . "'";
+		$strcurrency = "'" . $currency . "'";
+		
+		//echo $stracc2p . " " . $strcurrency;
+
 		$mysqli = get_sql_connection();
-		$result = $mysqli->query("SELECT cnt FROM accountcnt WHERE acc2p = '$acc2p' AND currency = '$currency'");
-		$cnt = $result->fetch_row()[0] + 1;
+
+		$stmt = $mysqli->prepare("SELECT cnt FROM accountcnt WHERE acc2p = ? AND currency = ?");
+		$stmt->bind_param("ss", $acc2p, $currency);
+		$stmt->execute();
+		$cnt = $stmt->get_result()->fetch_row()[0];		
+
+		echo $cnt;
 
 		// Структура банковского счета:
 		// 408 - счет физ.лица
@@ -35,9 +45,10 @@
 		// XXXX - отделение банка (0000 - головной офис)
 		// XXXXXX - порядковый номер счета банка
           
+		$cnt++;
 		$accountnum = $acc2p . $currency . "10001" . sprintf("%'.07d", $cnt);
 		if ($cnt == 1) {
-			$stmt = $mysqli->prepare("INSERT INTO accountcnt(acc2p, currency, cnt) VALUES (?, ?, ?)");
+			$stmt = $mysqli->prepare("INSERT INTO accountcnt (acc2p, currency, cnt) VALUES (?, ?, ?)");
 			$stmt->bind_param("ssi", $acc2p, $currency, $cnt);
 		}
 		else {
@@ -67,5 +78,38 @@
 		$stmt->execute();                          
 		$sum += $stmt->get_result()->fetch_row()[0];
 		return $sum;
+	}
+
+	function standart_phone($phone) {
+		$newphone = "";
+		$flag = 0;
+		for ($i = 0; $i < strlen($phone); $i++) {
+			$num = $phone[$i];
+			if ($num == '+') {
+				$flag = 1;
+				$newphone = "8";
+				continue;
+			}
+			if ($flag == 1) {
+				$flag = 0;
+				continue;
+			}
+			if ($num >= "0" && $num <= "9") {
+				$newphone = $newphone . $num;
+				continue;
+			}
+		}
+		return $newphone;
+	}
+	
+	function out_value($data) {
+		session_start();
+		$id = $_SESSION["client"]["id"];
+		$mysqli = get_sql_connection();                 
+		$stmt = $mysqli->prepare("SELECT " . $data . " FROM clients WHERE id = ?");
+		$stmt->bind_param("i", $id);
+		$stmt->execute();
+		$result = $stmt->get_result()->fetch_row()[0];
+		return 'value="' . $result . '"';
 	}
 ?>

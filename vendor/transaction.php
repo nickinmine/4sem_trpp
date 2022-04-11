@@ -5,7 +5,8 @@
 	
 	$mysqli = get_sql_connection();
 	$stmt = $mysqli->prepare("SELECT id FROM clients WHERE phone = ?");
-	$stmt->bind_param("s", $_POST["credit_phone"]);
+	$credit_phone = standart_phone($_POST["credit_phone"]);
+	$stmt->bind_param("s", $credit_phone);
 	$stmt->execute();
 	$credit_id = $stmt->get_result()->fetch_row()[0];  	
 	if ($credit_id == "") {
@@ -20,7 +21,7 @@
 	$stmt->execute();
 	$credit_accountnum = $stmt->get_result()->fetch_row()[0];  	
 	if ($credit_accountnum == "") {
-		$_SESSION["message-transaction"] = "У клиента нет подходящего счета для принятия перевода.";
+		$_SESSION["message-transaction"] = "У клиента нет подходящего счета для принятия перевода." . $credit_phone;
 		header("Location: ../operwork.php#transaction");
 		return;                               
 	}
