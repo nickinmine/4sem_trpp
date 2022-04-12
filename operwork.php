@@ -61,14 +61,14 @@
 				$result = $mysqli->query("SELECT * FROM currency");
 				$cnt = 0;
 				foreach ($result as $res) {
-					echo '<input type="radio" name="currency" value="' . $res["code"] . '"' . ($cnt == 0 ? 'checked=1' : '') . '>' . 
-					'<label>' . $res["isocode"] . " (" . $res["name"] . ')</label>';
+					echo '<div class="radio-currency"><input type="radio" name="currency" value="' . $res["code"] . '"' . ($cnt == 0 ? 'checked=1' : '') . '>' .
+					'<label>' . $res["isocode"] . " (" . $res["name"] . ')</label></div>';
 					$cnt++;
 				}
 				?>
 			</div>
 			<div><input class="button" type="submit" value="Создать"></div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-client"];
 				unset($_SESSION["message-client"]);
 			?></label>
@@ -179,16 +179,19 @@
 			<label><input type="date" name="birthdate" <?php echo out_value("birthdate"); ?>></label>
 
 			<label>Место рождения</label>
-			<label><input type="text" name="birthplace" placeholder="Регион, город" <?php echo out_value("birthplace"); ?>></label> 
+			<label><input type="text" name="birthplace" placeholder="Регион, город" <?php echo out_value("birthplace"); ?>></label>
 
-			<label>Адрес</label>
-			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира" <?php echo out_value("address"); ?>></label> 
+            <label>Адрес регистрации</label>
+            <label><input type="text" name="reg" placeholder="Индекс, регион, город, улица, дом, квартира" <?php echo out_value("reg"); ?>></label>
+
+			<label>Адрес проживания</label>
+			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира" <?php echo out_value("address"); ?>></label>
    			
 			<label>Электронная почта</label>
 			<label><input type="email" name="email" placeholder="example@email.com" <?php echo out_value("email"); ?>></label>  
 
 			<input class="button" type="submit" value="Сохранить">     
-			<label class="message"><?php
+			<label class="report"><?php
                 		echo $_SESSION['message-edit'];
                 		unset($_SESSION['message-edit']);
                 	?></label>

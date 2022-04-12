@@ -16,7 +16,9 @@
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/navbar.css">
-	<title>Оператор</title>
+	<title>Оператор<?php
+        echo " - " . $_SESSION['user']['name']
+        ?></title>
 </head>
 <body>
 <header class="header">
@@ -78,9 +80,12 @@
 			<label><input type="date" name="birthdate"></label>
 
 			<label>Место рождения</label>
-			<label><input type="text" name="birthplace" placeholder="Регион, город"></label> 
+			<label><input type="text" name="birthplace" placeholder="Регион, город"></label>
 
-			<label>Адрес</label>
+            <label>Адрес регистрации</label>
+            <label><input type="text" name="reg" placeholder="Индекс, регион, город, улица, дом, квартира"></label>
+
+			<label>Адрес проживания</label>
 			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира"></label> 
    			
 			<label>Электронная почта</label>

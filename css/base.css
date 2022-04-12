@@ -51,6 +51,7 @@ label{
 }
 .access-error{margin-top: 100px;}
 .message{color:red;}
+.report{color:inherit;}
 .form-name>p{
     text-align: center;
     font: inherit;
@@ -77,4 +78,16 @@ label{
 .select-block{
     text-align: center;
     margin-bottom: 10px;
+}
+.radio-currency{
+    margin: 15px 0 15px 30%;
+}
+.radio-currency>input{
+    display: unset;
+    margin: 0;
+    width: unset;
+    margin-right: 7px;
+}
+.radio-currency>label{
+    margin: 0;
 }

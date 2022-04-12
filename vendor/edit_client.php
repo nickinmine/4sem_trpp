@@ -5,7 +5,7 @@
 
 	$mysqli = get_sql_connection();
 	$stmt = $mysqli->prepare("UPDATE clients SET name = ?, email = ?, birthdate = ?, passport = ?, address = ?, phone = ?, passgiven = ?, " .
-		"passcode = ?, passdate = ?, sex = ?, birthplace = ? WHERE id = ?");	        
+		"passcode = ?, passdate = ?, sex = ?, birthplace = ?, reg = ? WHERE id = ?");
  
 	$name = $_POST["name"];
 	$phone = standart_phone($_POST["phone"]);
@@ -18,9 +18,10 @@
 	$birthplace = $_POST["birthplace"];
 	$address = $_POST["address"];
 	$email = $_POST["email"];
+    $reg = $_POST["reg"];
 	$id = $_SESSION["client"]["id"];
      
-	$stmt->bind_param("sssssssssssi", $name, $email, $birthdate, $passport, $address, $phone, $passgiven, $passcode, $passdate, $sex, $birthplace, $id);
+	$stmt->bind_param("ssssssssssssi", $name, $email, $birthdate, $passport, $address, $phone, $passgiven, $passcode, $passdate, $sex, $birthplace, $reg, $id);
 	$stmt->execute();
 
 	//$_SESSION["client"]["id"] = 

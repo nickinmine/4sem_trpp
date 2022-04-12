@@ -16,7 +16,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/navbar.css">
-    <title>Бухгалтер</title>
+    <title>Бухгалтер<?php
+        echo " - " . $_SESSION['user']['name']
+        ?></title>
 </head>
 <body>
 <header class="header">
