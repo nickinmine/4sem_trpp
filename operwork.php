@@ -86,7 +86,7 @@
 				</select></div></label>
 			</div>
 			<div>
-				<label>Сумма пополнения<input pattern="^[0-9]+\.[0-9]{2}$" name="sum" required placeholder="100.00"></label>
+				<label>Сумма пополнения<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
 				<input class="button" type="submit" value="Пополнить">
@@ -98,27 +98,55 @@
 		</form>
 	</div>
 	<div class="form">
-		<a class="anchor" id="transaction"></a>
-		<div class="form-name"><p>Перевод средств со счета на счет в пределах одной валюты</p></div>
-		<form action="vendor/transaction.php" method="POST">
-			<div class="form-content"><p>Счет перевода</p>
+		<a class="anchor" id="transaction_in"></a>
+		<div class="form-name"><p>Перевод средств между своими счетами</p></div>
+		<form action="vendor/transaction_in.php" method="POST">
+			<div class="form-content"><p>Счет отправки перевода</p>
+				<label><div class="select-block"><select name="debit_accountnum" required>
+					<option selected> - Выберите счет - </option>
+					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+				</select></div></label>
+			</div>
+			<div class="form-content"><p>Счет приема перевода</p>
+				<label><div class="select-block"><select name="credit_accountnum" required>
+					<option selected> - Выберите счет - </option>
+					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+				</select></div></label>
+			</div>
+			<div>
+				<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+			</div>
+			<div>
+				<input class="button" type="submit" value="Перевести">
+			</div>
+			<label class="message"><?php
+				echo $_SESSION["message-transaction_in"];
+				unset($_SESSION["message-transaction_in"]);
+			?></label>
+		</form>
+	</div>
+	<div class="form">
+		<a class="anchor" id="transaction_out"></a>
+		<div class="form-name"><p>Перевод средств другому клиенту</p></div>
+		<form action="vendor/transaction_out.php" method="POST">
+			<div class="form-content"><p>Счет отправки перевода</p>
 				<label><div class="select-block"><select name="debit_accountnum" required>
 					<option selected> - Выберите счет - </option>
 					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
 				</select></div></label>
 			</div>
 			<div>
-				<label>Перевод клиенту с номером телефона:<input type="tel" name="credit_phone" required placeholder="+78005553535"></label>
+				<label>Перевод клиенту с номером телефона:<input type="tel" name="credit_phone" required placeholder="Номер телефона"></label>
 			</div>
 			<div>
-				<label>Сумма перевода<input pattern="^[0-9]+\.[0-9]{2}$" name="sum" required placeholder="100.00"></label>
+				<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
 				<input class="button" type="submit" value="Перевести">
 			</div>
 			<label class="message"><?php
-				echo $_SESSION["message-transaction"];
-				unset($_SESSION["message-transaction"]);
+				echo $_SESSION["message-transaction_out"];
+				unset($_SESSION["message-transaction_out"]);
 			?></label>
 		</form>
 	</div>

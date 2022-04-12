@@ -57,7 +57,7 @@
 			<label><input type="text" required="required" name="name" placeholder="Иванов Иван Иванович"></label>
 
 			<label>Телефон</label>
-			<label><input type="tel" required="required" name="phone" placeholder="+78005553535"></label>
+			<label><input type="tel" required="required" name="phone" placeholder="Номер телефона"></label>
 
 			<label>Номер паспорта</label>
 			<label><input pattern="^[0-9]{4} [0-9]{6}$" required="required" name="passport" placeholder="Серия и номер"></label>

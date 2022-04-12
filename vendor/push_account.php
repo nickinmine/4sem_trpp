@@ -16,8 +16,9 @@
 		return;                               
 	}
 	$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
-		"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");	
-	$stmt->bind_param("ssss", $debit_accountnum, $_POST["credit_accountnum"],  $_POST["sum"], $_SESSION["user"]["login"]);
+		"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
+	$sum = standart_sum($_POST["sum"]);	
+	$stmt->bind_param("ssss", $debit_accountnum, $_POST["credit_accountnum"], $sum, $_SESSION["user"]["login"]);
 	if (!$stmt->execute()) {
 		$_SESSION["message-push"] = "Пополнение не выполнено. Попробуйте позже.";
 		header("Location: ../operwork.php#push_account");

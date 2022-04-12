@@ -102,6 +102,38 @@
 		return $newphone;
 	}
 	
+	function standart_sum($sum) {
+		$newsum = "";
+		$flag = -1;
+		for ($i = 0; $i < strlen($sum); $i++) {
+			$num = $sum[$i];
+			if ($num == "." || $num == ",") {
+				$flag = 0;
+				$newsum .= "."; 
+				continue;
+			}
+			if ($flag == -1) {
+				$newsum .= $num;
+				continue;
+			}
+			if ($flag >= 0 && $flag < 2) {
+				$flag++;
+				$newsum .= $num;
+				continue;
+			}
+			
+		}
+		if ($flag == -1) {
+			$flag++;
+			$newsum .= ".";
+		}
+		while ($flag < 2) {
+			$flag++;
+			$newsum .= "0";
+		}
+		return $newsum;
+	}
+
 	function out_value($data) {
 		session_start();
 		$id = $_SESSION["client"]["id"];
