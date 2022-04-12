@@ -16,18 +16,18 @@
 	$credit_currency = $stmt->get_result()->fetch_row()[0];
 
 	if ($_POST["debit_accountnum"] == $_POST["credit_accountnum"]) {
-		$_SESSION["message-transaction_in"] = "Выберите разные счета.";
-        	header("Location: ../operwork.php#transaction_in");
+		$_SESSION["message-transaction_acc"] = "Выберите разные счета.";
+        	header("Location: ../acc.php#transaction_acc");
 		return;
 	}	
 	if ($credit_currency != $debit_currency) {
-        	$_SESSION["message-transaction_in"] = "Выберите счета с одинаковой валютой.";
-        	header("Location: ../operwork.php#transaction_in");
+        	$_SESSION["message-transaction_acc"] = "Выберите счета с одинаковой валютой.";
+        	header("Location: ../acc.php#transaction_acc");
 		return;
 	}
 	if (check_balance($_POST["debit_accountnum"]) - $_POST["sum"] < 0) {
-		$_SESSION["message-transaction_in"] = "Перевод не выполнен. Недостаточно средств.";
-		header("Location: ../operwork.php#transaction_in");
+		$_SESSION["message-transaction_acc"] = "Перевод не выполнен. Недостаточно средств.";
+		header("Location: ../acc.php#transaction_acc");
 		return;
 	}
 	$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
@@ -35,11 +35,11 @@
 	$sum = standart_sum($_POST["sum"]);	
 	$stmt->bind_param("ssss", $_POST["debit_accountnum"], $_POST["credit_accountnum"], $sum, $_SESSION["user"]["login"]);
 	if (!$stmt->execute()) {
-		$_SESSION["message-transaction_in"] = "Перевод не выполнен. Попробуйте позже.";
-		header("Location: ../operwork.php#transaction_in");
+		$_SESSION["message-transaction_acc"] = "Перевод не выполнен. Попробуйте позже.";
+		header("Location: ../acc.php#transaction_acc");
 		return;
 	}	
-	$_SESSION["message-transaction_in"] = "Успешный перевод.";
-        header("Location: ../operwork.php#transaction_in");
+	$_SESSION["message-transaction_acc"] = "Успешный перевод.";
+        header("Location: ../acc.php#transaction_acc");
 		
 ?>

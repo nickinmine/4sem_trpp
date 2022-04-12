@@ -14,6 +14,11 @@
 		header("Location: ../operwork.php#transaction");
 		return;                               
 	}
+	if ($_SESSION["client"]["id"] == $credit_id) {
+		$_SESSION["message-transaction_out"] = "Перевод себе недоступен по номеру телефона.";
+		header("Location: ../operwork.php#transaction_out");
+		return;
+	}
 	$stmt = $mysqli->prepare("SELECT accountnum FROM account WHERE idclient = ? AND currency = (" .
 		"SELECT currency FROM account WHERE accountnum = ? AND closed = '0000-00-00' " .
 		") AND closed = '0000-00-00' AND `default` = 1");
@@ -21,7 +26,7 @@
 	$stmt->execute();
 	$credit_accountnum = $stmt->get_result()->fetch_row()[0];	             
 	if ($credit_accountnum == "") {
-		$_SESSION["message-transaction_out"] = "У клиента нет подходящего счета для принятия перевода." . $credit_phone;
+		$_SESSION["message-transaction_out"] = "У клиента нет подходящего счета для принятия перевода.";
 		header("Location: ../operwork.php#transaction_out");
 		return;                               
 	}                                                                

@@ -132,7 +132,7 @@
 			</div>
 			<div class="form-content"><p>Счет приема перевода</p>
 				<label><div class="select-block"><select name="credit_accountnum" required>
-					<option selected> - Выберите счет - </option>
+					<option selected></option>
 					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
 				</select></div></label>
 			</div>
