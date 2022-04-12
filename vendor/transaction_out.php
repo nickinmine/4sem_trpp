@@ -24,9 +24,9 @@
 		$_SESSION["message-transaction_out"] = "У клиента нет подходящего счета для принятия перевода." . $credit_phone;
 		header("Location: ../operwork.php#transaction_out");
 		return;                               
-	}
-	/*if (check_balance($credit_accountnum) - $_POST["sum"] < 0) {
-		$_SESSION["message-transaction_in"] = "Перевод не выполнен. Недостаточно средств.";
+	}                                                                
+	if (check_balance($_POST["debit_accountnum"]) - $_POST["sum"] < 0) {
+		$_SESSION["message-transaction_out"] = "Перевод не выполнен. Недостаточно средств.";
 		header("Location: ../operwork.php#transaction_out");
 		return;
 	}
@@ -40,6 +40,6 @@
 		return;
 	}	
 	$_SESSION["message-transaction_out"] = "Успешный перевод.";
-        header("Location: ../operwork.php#transaction_out");*/
+        header("Location: ../operwork.php#transaction_out");
 		
 ?>

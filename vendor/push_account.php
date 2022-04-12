@@ -11,7 +11,7 @@
 	$stmt->execute();
 	$debit_accountnum = $stmt->get_result()->fetch_row()[0]; // счет кассы 	
 	if ($debit_accountnum == "") {
-		$_SESSION["message-push"] = "Не найден счет кассы." . $_POST["credit_accountnum"];
+		$_SESSION["message-push"] = "Не найден счет кассы.";
 		header("Location: ../operwork.php#push_account");
 		return;                               
 	}

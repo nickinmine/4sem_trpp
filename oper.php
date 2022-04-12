@@ -51,7 +51,6 @@
 			?></label>
 		</form>
 	</div>
-
 	<div class="form">
 		<div class="form-name"><p>Создать профиль клиента</p></div>
 		<form action="vendor/create_client.php" method="POST">
@@ -82,8 +81,8 @@
 			<label>Место рождения</label>
 			<label><input type="text" name="birthplace" placeholder="Регион, город"></label>
 
-            <label>Адрес регистрации</label>
-            <label><input type="text" name="reg" placeholder="Индекс, регион, город, улица, дом, квартира"></label>
+			<label>Адрес регистрации</label>
+			<label><input type="text" name="reg" placeholder="Индекс, регион, город, улица, дом, квартира"></label>
 
 			<label>Адрес проживания</label>
 			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира"></label> 

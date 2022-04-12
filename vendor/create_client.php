@@ -17,13 +17,12 @@
 	$birthdate = ($_POST["birthdate"] == "" ? "0000-00-00" : $_POST["birthdate"]);
 	$birthplace = $_POST["birthplace"];
 	$address = $_POST["address"];
-    $reg = $_POST['reg'];
+	$reg = $_POST['reg'];
 	$email = $_POST["email"];
      
 	$stmt->bind_param("ssssssssssss", $name, $email, $birthdate, $passport, $address, $phone, $passgiven, $passcode, $passdate, $sex, $birthplace, $reg);
 	$stmt->execute();
-
-	//$_SESSION["client"]["id"] = 
+                                      
 	header('Location: ../oper.php');
 	$_SESSION['message'] = "Клиент успешно создан.";
 

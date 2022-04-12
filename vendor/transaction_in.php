@@ -20,7 +20,7 @@
         	header("Location: ../operwork.php#transaction_in");
 		return;
 	}
-	if (check_balance($_POST["credit_accountnum"]) - $_POST["sum"] < 0) {
+	if (check_balance($_POST["debit_accountnum"]) - $_POST["sum"] < 0) {
 		$_SESSION["message-transaction_in"] = "Перевод не выполнен. Недостаточно средств.";
 		header("Location: ../operwork.php#transaction_in");
 		return;

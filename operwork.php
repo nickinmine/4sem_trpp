@@ -81,7 +81,7 @@
 			<div class="form-content">
 				<p>Выберите счет</p>
 				<label><div class="select-block"><select name="credit_accountnum" required>
-					<option selected> - Выберите счет - </option>
+					<option selected></option>
 					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
 				</select></div></label>
 			</div>
@@ -98,12 +98,35 @@
 		</form>
 	</div>
 	<div class="form">
+		<a class="anchor" id="pop_account"></a>
+		<div class="form-name"><p>Снять средства со счета</p></div>
+		<form action="vendor/pop_account.php" method="POST">
+			<div class="form-content">
+				<p>Выберите счет</p>
+				<label><div class="select-block"><select name="debit_accountnum" required>
+					<option selected></option>
+					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+				</select></div></label>
+			</div>
+			<div>
+				<label>Сумма снятия<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+			</div>
+			<div>
+				<input class="button" type="submit" value="Снять">
+			</div>
+			<label class="message"><?php
+				echo $_SESSION["message-pop"];
+				unset($_SESSION["message-pop"]);
+			?></label>
+		</form>
+	</div>
+	<div class="form">
 		<a class="anchor" id="transaction_in"></a>
 		<div class="form-name"><p>Перевод средств между своими счетами</p></div>
 		<form action="vendor/transaction_in.php" method="POST">
 			<div class="form-content"><p>Счет отправки перевода</p>
 				<label><div class="select-block"><select name="debit_accountnum" required>
-					<option selected> - Выберите счет - </option>
+					<option selected></option>
 					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
 				</select></div></label>
 			</div>
@@ -131,7 +154,7 @@
 		<form action="vendor/transaction_out.php" method="POST">
 			<div class="form-content"><p>Счет отправки перевода</p>
 				<label><div class="select-block"><select name="debit_accountnum" required>
-					<option selected> - Выберите счет - </option>
+					<option selected></option>
 					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
 				</select></div></label>
 			</div>
@@ -181,8 +204,8 @@
 			<label>Место рождения</label>
 			<label><input type="text" name="birthplace" placeholder="Регион, город" <?php echo out_value("birthplace"); ?>></label>
 
-            <label>Адрес регистрации</label>
-            <label><input type="text" name="reg" placeholder="Индекс, регион, город, улица, дом, квартира" <?php echo out_value("reg"); ?>></label>
+			<label>Адрес регистрации</label>
+			<label><input type="text" name="reg" placeholder="Индекс, регион, город, улица, дом, квартира" <?php echo out_value("reg"); ?>></label>
 
 			<label>Адрес проживания</label>
 			<label><input type="text" name="address" placeholder="Индекс, регион, город, улица, дом, квартира" <?php echo out_value("address"); ?>></label>
@@ -197,7 +220,6 @@
                 	?></label>
 		</form>
 	</div>
-
 </main>
 </body>
 </html>

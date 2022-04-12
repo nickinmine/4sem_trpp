@@ -18,7 +18,7 @@
 	$birthplace = $_POST["birthplace"];
 	$address = $_POST["address"];
 	$email = $_POST["email"];
-    $reg = $_POST["reg"];
+	$reg = $_POST["reg"];
 	$id = $_SESSION["client"]["id"];
      
 	$stmt->bind_param("ssssssssssssi", $name, $email, $birthdate, $passport, $address, $phone, $passgiven, $passcode, $passdate, $sex, $birthplace, $reg, $id);
