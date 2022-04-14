@@ -8,6 +8,13 @@
 		return $_SESSION["connection"];
 	}
 	
+	/*function out_header_menu($role) {
+		if ($role == "admin" || $role == "operator")
+			echo '<div class="subbutton" onclick="document.location.href="oper.php"">Оператор</div>';
+		if ($role == "admin" || $role == "accountant")
+			echo '<div class="subbutton" onclick="document.location.href="acc.php"">Бухгалтер</div>';
+	}*/
+
 	function out_account_box($idclient) {
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare('SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency ' . 

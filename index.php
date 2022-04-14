@@ -26,8 +26,8 @@
             </label>
             <button type="submit">Войти</button>
             <label class="message"><?php
-                echo $_SESSION['message'];
-                unset($_SESSION['message']);
+                echo $_SESSION['message-auth'];
+                unset($_SESSION['message-auth']);
                 ?></label>
         </form>
     </div>

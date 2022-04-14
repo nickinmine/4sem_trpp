@@ -19,10 +19,15 @@
 			"role" => $user['role'],
 			"descript" => $user['descript']
 		];
-		header('Location: ../main.php');
+		if ($_SESSION["user"]["role"] == "admin" || $_SESSION["user"]["role"] == "operator") {
+			header('Location: ../oper.php');	
+		}
+		else if ($_SESSION["user"]["role"] == "accountant") {
+			header('Location: ../acc.php');	
+		}
 	}
 	else {
 		header('Location: ../');
-		$_SESSION['message'] = 'Неверный пароль!';
+		$_SESSION['message-auth'] = 'Неверный пароль!';
 	}
 ?>

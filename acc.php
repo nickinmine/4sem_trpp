@@ -7,7 +7,7 @@
 		header('Location: /');
 	}
 	if ($_SESSION['user']['role'] != 'admin' & $_SESSION['user']['role'] != 'accountant') {
-		header('Location: /main.php');
+		header('Location: /oper.php');
 		$_SESSION['message'] = 'Отказано в доступе: несоответствие уровня доступа.';
 	}
 ?>
@@ -27,7 +27,6 @@
 <header class="header">
 	<div class="header-container">
 		<div class="header-menu">
-			<div class="subbutton" onclick="document.location.href='main.php'">Главная</div>
 			<div class="subbutton" onclick="document.location.href='oper.php'">Оператор</div>
 			<div class="subbutton" onclick="document.location.href='acc.php'">Бухгалтер</div>
 		</div>
