@@ -88,7 +88,31 @@
 			?></label>
 		</form>
 	</div>
-
+        <div class="form">
+		<a class="anchor" id="change_currency_cost"></a>
+		<div class="form-name"><p>Создать новый счет</p></div>
+		<form action="vendor/change_currency_cost.php" method="POST">
+			<div class="form-content">
+				<p>Валюта</p>
+				<?php
+				$mysqli = get_sql_connection();
+				$result = $mysqli->query("SELECT * FROM currency WHERE code != '810'");
+				$cnt = 0;
+				foreach ($result as $res) {
+					echo '<div class="radio-currency"><input type="radio" name="currency" value="' . $res["code"] . '"' . 
+						($cnt == 0 ? 'checked=1' : '') . '>' . '<label>' . $res["isocode"] . " (" . $res["name"] . ')</label></div>';
+					$cnt++;
+				}
+				?>
+			</div>
+			<div><label>Новая стоимость в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label></div>
+			<div><input class="button" type="submit" value="Обновить"></div>
+			<label class="report"><?php
+				echo $_SESSION["message-currency_cost"];
+				unset($_SESSION["message-currency_cost"]);
+			?></label>
+		</form>
+	</div>
 
 
 </main>

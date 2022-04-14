@@ -60,8 +60,8 @@
 				$result = $mysqli->query("SELECT * FROM currency");
 				$cnt = 0;
 				foreach ($result as $res) {
-					echo '<div class="radio-currency"><input type="radio" name="currency" value="' . $res["code"] . '"' . ($cnt == 0 ? 'checked=1' : '') . '>' .
-					'<label>' . $res["isocode"] . " (" . $res["name"] . ')</label></div>';
+					echo '<div class="radio-currency"><input type="radio" name="currency" value="' . $res["code"] . '"' . 
+						($cnt == 0 ? 'checked=1' : '') . '>' . '<label>' . $res["isocode"] . " (" . $res["name"] . ')</label></div>';
 					$cnt++;
 				}
 				?>

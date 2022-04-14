@@ -36,12 +36,7 @@
 		return $str;
 	}
 
-	function generate_accountnum($acc2p, $currency) {
-		$stracc2p = "'" . $acc2p . "'";
-		$strcurrency = "'" . $currency . "'";
-		
-		//echo $stracc2p . " " . $strcurrency;
-
+	function generate_accountnum($acc2p, $currency) {             
 		$mysqli = get_sql_connection();
 
 		$stmt = $mysqli->prepare("SELECT cnt FROM accountcnt WHERE acc2p = ? AND currency = ?");
@@ -89,7 +84,7 @@
 		$sign = ($stmt->get_result()->fetch_row()[0] == "active" ? 1 : -1);	
 
 		if ($res) {
-			$sum = /*$sign **/ $res[0];
+			$sum = $res[0];
 			$dt = $res[1];	
 		}
 
@@ -99,7 +94,7 @@
 		$stmt->execute();                          
 		$sum += $sign * $stmt->get_result()->fetch_row()[0];	
 
-		return /*$sign **/ $sum;   
+		return $sum;   
 	}
 
 	function standart_phone($phone) {
@@ -125,6 +120,7 @@
 	}
 	
 	function standart_sum($sum) {
+		$sum = strval($sum);
 		$newsum = "";
 		$flag = -1;
 		for ($i = 0; $i < strlen($sum); $i++) {
@@ -165,5 +161,20 @@
 		$stmt->execute();
 		$result = $stmt->get_result()->fetch_row()[0];
 		return 'value="' . $result . '"';
+	}
+
+	function convert_sum($sum, $in_currency, $out_currency) {
+		$mysqli = get_sql_connection();
+		$stmt = $mysqli->prepare("SELECT cost FROM converter WHERE current = 1 AND currency = ?");
+
+		$stmt->bind_param("s", $in_currency);
+		$stmt->execute();
+		$in_sum = $sum * $stmt->get_result()->fetch_row()[0];
+
+		$stmt->bind_param("s", $out_currency);
+		$stmt->execute();
+		$out_sum = $in_sum / $stmt->get_result()->fetch_row()[0];
+		
+		return standart_sum($out_sum);
 	}
 ?>
