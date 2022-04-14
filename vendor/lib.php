@@ -10,15 +10,22 @@
 	
 	function out_account_box($idclient) {
 		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare('SELECT accountnum, isocode FROM account a LEFT JOIN currency c ON c.code = a.currency ' . 
+		$stmt = $mysqli->prepare('SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency ' . 
 			'WHERE closed = "0000-00-00" AND idclient = ?');
 		$stmt->bind_param("i", $idclient);
 		$stmt->execute();
 		$result = $stmt->get_result();
 		$str = "";
-		foreach ($result as $res)
+
+		foreach ($result as $res) {
+			$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
+			$stmt->bind_param("s", $res["accountnum"]);
+			$stmt->execute();
+			$type = $stmt->get_result()->fetch_row()[0];
+			$sign = ($type == "active" ? 1 : -1);	
 			$str .= '<option value = "' . $res["accountnum"] . '">Счет №' . $res["accountnum"] . ': ' 
-				. sprintf("%.2f", check_balance($res["accountnum"])) . ' ' . $res["isocode"] . '</option>';
+				. sprintf("%.2f", $sign * check_balance($res["accountnum"])) . ' ' . $res["isocode"] . ', ' . $res["descript"] . '</option>';
+		}
 		return $str;
 	}
 
@@ -60,7 +67,7 @@
 		return $accountnum;
 	}
 
-	function check_balance($accountnum) {
+	function check_balance($accountnum) { // баланс считается на конец дня
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare("SELECT `sum`, dt FROM balance WHERE account = ? ORDER BY dt DESC LIMIT 1");
 		$stmt->bind_param("s", $accountnum);
@@ -68,16 +75,24 @@
 		$res = $stmt->get_result()->fetch_row();
 		$sum = 0;
 		$dt = "0000-00-00";
+
+		$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
+		$stmt->bind_param("s", $accountnum);
+		$stmt->execute();
+		$sign = ($stmt->get_result()->fetch_row()[0] == "active" ? 1 : -1);	
+
 		if ($res) {
-			$sum = $res[0];
+			$sum = /*$sign **/ $res[0];
 			$dt = $res[1];	
 		}
+
 		$stmt = $mysqli->prepare("SELECT IFNULL((SELECT -1 * SUM(`sum`) FROM operations WHERE operdate > concat(?, ' 23:59:59') AND db = ?), 0)" .
 			" + IFNULL((SELECT SUM(`sum`) FROM operations WHERE operdate > concat(?, ' 23:59:59') AND cr = ?), 0)");
 		$stmt->bind_param("ssss", $dt, $accountnum, $dt, $accountnum);
 		$stmt->execute();                          
-		$sum += $stmt->get_result()->fetch_row()[0];
-		return $sum;
+		$sum += $sign * $stmt->get_result()->fetch_row()[0];	
+
+		return /*$sign **/ $sum;   
 	}
 
 	function standart_phone($phone) {
