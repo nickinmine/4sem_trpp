@@ -93,8 +93,8 @@
 
 			<input class="button" type="submit" value="Создать">     
 			<label class="message"><?php
-                		echo $_SESSION['message'];
-                		unset($_SESSION['message']);
+                		echo $_SESSION['message-create-client'];
+                		unset($_SESSION['message-create-client']);
                 	?></label>
 		</form>
 	</div>
