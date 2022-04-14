@@ -13,7 +13,8 @@
 		header("Location: ../operwork.php#close_account");
 		return;
 	}
-	
+			
+	$mysqli = get_sql_connection();
 	$stmt = $mysqli->prepare("UPDATE account SET closed = (SELECT operdate FROM operdays WHERE current = 1) WHERE accountnum = ?");
 	$stmt->bind_param("s", $_POST["accountnum"]);
 	$stmt->execute();
