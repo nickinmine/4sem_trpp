@@ -24,7 +24,7 @@
 	$stmt->execute();
                                       
 	header('Location: ../oper.php');
-	$_SESSION['message'] = "Клиент успешно создан.";
+	$_SESSION['message-create-client'] = "Клиент успешно создан.";
 
 
 ?>
