@@ -82,7 +82,7 @@
 			<div>
 				<input class="button" type="submit" value="Перевести">
 			</div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-transaction_acc"];
 				unset($_SESSION["message-transaction_acc"]);
 			?></label>
