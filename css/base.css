@@ -5,7 +5,7 @@
     font-family: 'Montserrat', sans-serif;
 }
 main{
-    margin-top: 130px;
+    margin-top: 100px;
 }
 header{
     left: 0;
@@ -27,7 +27,7 @@ input{
     width: 50%;
     border-bottom:1px solid #e3e3e3;
     padding:5px 10px;
-    margin:0px auto;
+    margin:0 auto;
     margin-top: 5px;
     margin-bottom: 15px;
 }
@@ -35,8 +35,7 @@ input{
 input[type="submit"]{
     width: 19%;
     margin-top: 15px;
-    color:#fbfafd;
-    background-color: #88b4d9;
+    background-color: #9ad5ff;
     cursor:pointer;
     position: center;
     height: 30px;

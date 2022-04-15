@@ -19,6 +19,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/navbar.css">
+    <link rel="icon" type="image/png" href="images/favicon.png">
 	<title>Работа с клиентом</title>
 	<script src="js/script.js"></script>
 </head>
