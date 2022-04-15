@@ -19,7 +19,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="css/base.css">
 	<link rel="stylesheet" href="css/navbar.css">
-    <link rel="icon" type="image/png" href="images/favicon.png">
+	<link rel="icon" type="image/png" href="images/favicon.png">
 	<title>Оператор<?php
         echo " - " . $_SESSION['user']['name']
         ?></title>
