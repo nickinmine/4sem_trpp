@@ -37,16 +37,35 @@
 
 		$mysqli->query("BEGIN");
 	
+	 	$sum = standart_sum($_POST["sum"]);	
+		
+		$stmt = $mysqli->prepare("SELECT cost, sell FROM converter WHERE current = 1 AND currency = ?");
+		$stmt->bind_param("s", $debit_currency);
+		$stmt->execute();	
+		$data = $stmt->get_result()->fetch_row();
+		$bank_income_sum = $sum * $data[1] - $sum * $data[0];
+		$stmt = $mysqli->prepare("SELECT cost, buy FROM converter WHERE current = 1 AND currency = ?");
+		$stmt->bind_param("s", $credit_currency);
+		$stmt->execute();
+		$data = $stmt->get_result()->fetch_row();
+		$bank_income_sum += $sum * $data[0] - $sum * $data[1];
+		$stmt = $mysqli->prepare("SELECT accountnum FROM account WHERE accountnum LIKE '70601%1' AND currency = ?");
+		$stmt->bind_param("s", $credit_currency);
+		$stmt->execute();
+		$bank_income_accountnum = $stmt->get_result()->fetch_row()[0];
+                
 		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
 			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
-		$sum = standart_sum($_POST["sum"]);	
 		$stmt->bind_param("ssss", $_POST["debit_accountnum"], $convert_debit_accountnum, $sum, $_SESSION["user"]["login"]);
 		$stmt->execute();
 
-		$conv_sum = convert_sum($sum, $debit_currency, $credit_currency);
+		$conv_sum = convert_sum($sum, $debit_currency, $credit_currency) - $bank_income_sum;
 		$stmt->bind_param("ssss", $convert_credit_accountnum, $_POST["credit_accountnum"], $conv_sum, $_SESSION["user"]["login"]);
 		$stmt->execute();
 
+		$stmt->bind_param("ssss", $_POST["credit_accountnum"], $bank_income_accountnum, $bank_income_sum, $_SESSION["user"]["login"]);
+		$stmt->execute();
+	
                 $mysqli->query("COMMIT");
 
 	        $_SESSION["message-transaction_in"] = "Успешный перевод с конвертацией валют.";

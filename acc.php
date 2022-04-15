@@ -90,7 +90,7 @@
 	</div>
         <div class="form">
 		<a class="anchor" id="change_currency_cost"></a>
-		<div class="form-name"><p>Создать новый счет</p></div>
+		<div class="form-name"><p>Обновить курс валют</p></div>
 		<form action="vendor/change_currency_cost.php" method="POST">
 			<div class="form-content">
 				<p>Валюта</p>
@@ -105,7 +105,9 @@
 				}
 				?>
 			</div>
-			<div><label>Новая стоимость в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label></div>
+			<div><label>Стоимость покупки в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="buy_sum" required placeholder="100.00"></label></div>
+			<div><label>Стоимость, установленная ЦБ в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="cost_sum" required placeholder="100.00"></label></div>
+			<div><label>Стоимость продажи в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="sell_sum" required placeholder="100.00"></label></div>
 			<div><input class="button" type="submit" value="Обновить"></div>
 			<label class="report"><?php
 				echo $_SESSION["message-currency_cost"];

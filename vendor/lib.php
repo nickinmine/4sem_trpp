@@ -165,15 +165,18 @@
 
 	function convert_sum($sum, $in_currency, $out_currency) {
 		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare("SELECT cost FROM converter WHERE current = 1 AND currency = ?");
 
+		$stmt = $mysqli->prepare("SELECT sell FROM converter WHERE current = 1 AND currency = ?");
 		$stmt->bind_param("s", $in_currency);
 		$stmt->execute();
-		$in_sum = $sum * $stmt->get_result()->fetch_row()[0];
+		$sell_sum = $stmt->get_result()->fetch_row()[0];
+		$in_sum = $sum * $sell_sum;
 
+		$stmt = $mysqli->prepare("SELECT buy FROM converter WHERE current = 1 AND currency = ?");
 		$stmt->bind_param("s", $out_currency);
 		$stmt->execute();
-		$out_sum = $in_sum / $stmt->get_result()->fetch_row()[0];
+		$buy_sum = $stmt->get_result()->fetch_row()[0];
+		$out_sum = $in_sum / $buy_sum;
 		
 		return standart_sum($out_sum);
 	}
