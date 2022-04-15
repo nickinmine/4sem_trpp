@@ -87,7 +87,7 @@
 			<div>
 				<input class="button" type="submit" value="Закрыть">
 			</div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-close"];
 				unset($_SESSION["message-close"]);
 			?></label>
@@ -110,7 +110,7 @@
 			<div>
 				<input class="button" type="submit" value="Пополнить">
 			</div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-push"];
 				unset($_SESSION["message-push"]);
 			?></label>
@@ -133,7 +133,7 @@
 			<div>
 				<input class="button" type="submit" value="Снять">
 			</div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-pop"];
 				unset($_SESSION["message-pop"]);
 			?></label>
@@ -161,7 +161,7 @@
 			<div>
 				<input class="button" type="submit" value="Перевести">
 			</div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-transaction_in"];
 				unset($_SESSION["message-transaction_in"]);
 			?></label>
@@ -186,7 +186,7 @@
 			<div>
 				<input class="button" type="submit" value="Перевести">
 			</div>
-			<label class="message"><?php
+			<label class="report"><?php
 				echo $_SESSION["message-transaction_out"];
 				unset($_SESSION["message-transaction_out"]);
 			?></label>

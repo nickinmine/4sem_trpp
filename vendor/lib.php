@@ -15,6 +15,15 @@
 			echo '<div class="subbutton" onclick="document.location.href="acc.php"">Бухгалтер</div>';
 	}*/
 
+	function addlog($str) {
+		$logfile = "..\\!log.txt";
+		$fd = fopen($logfile, 'a+');
+		if ($fd) {
+			fwrite($fd, date("Y-m-d H:i:s") . " " . $str . "\r\n");
+			fclose($fd);
+		}
+	}
+
 	function out_account_box($idclient) {
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare('SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency ' . 
@@ -120,36 +129,7 @@
 	}
 	
 	function standart_sum($sum) {
-		$sum = strval($sum);
-		$newsum = "";
-		$flag = -1;
-		for ($i = 0; $i < strlen($sum); $i++) {
-			$num = $sum[$i];
-			if ($num == "." || $num == ",") {
-				$flag = 0;
-				$newsum .= "."; 
-				continue;
-			}
-			if ($flag == -1) {
-				$newsum .= $num;
-				continue;
-			}
-			if ($flag >= 0 && $flag < 2) {
-				$flag++;
-				$newsum .= $num;
-				continue;
-			}
-			
-		}
-		if ($flag == -1) {
-			$flag++;
-			$newsum .= ".";
-		}
-		while ($flag < 2) {
-			$flag++;
-			$newsum .= "0";
-		}
-		return $newsum;
+		return sprintf("%.2f", $sum);
 	}
 
 	function out_value($data) {
@@ -163,21 +143,112 @@
 		return 'value="' . $result . '"';
 	}
 
+	function create_account($idclient, $currency, $acc2p, $descript) {
+		$accountnum = generate_accountnum($acc2p, $currency);
+		
+		$mysqli = get_sql_connection();
+	
+		$stmt = $mysqli->prepare("SELECT count(*) FROM account WHERE idclient = ? AND closed = '0000-00-00' AND currency = ?");
+		$stmt->bind_param("is", $idclient, $currency);
+		$stmt->execute();
+		$cntaccount = $stmt->get_result()->fetch_row()[0];
+
+		$default = 1; // счет по умолчанию для приема переводов
+		if ($cntaccount > 0)
+			$default = 0;
+
+		$stmt = $mysqli->prepare("INSERT INTO account (idclient, accountnum, currency, descript, `default`) VALUES (?, ?, ?, ?, ?)");
+	        
+        	$stmt->bind_param("isssi", $idclient, $accountnum, $currency, $descript, $default);
+		
+		if (!$stmt->execute()) {
+			return $mysqli->error;
+		}
+
+		return "";
+	}
+
 	function convert_sum($sum, $in_currency, $out_currency) {
 		$mysqli = get_sql_connection();
 
-		$stmt = $mysqli->prepare("SELECT sell FROM converter WHERE current = 1 AND currency = ?");
+		$stmt = $mysqli->prepare("SELECT buy FROM converter WHERE current = 1 AND currency = ?");
 		$stmt->bind_param("s", $in_currency);
 		$stmt->execute();
 		$sell_sum = $stmt->get_result()->fetch_row()[0];
 		$in_sum = $sum * $sell_sum;
-
-		$stmt = $mysqli->prepare("SELECT buy FROM converter WHERE current = 1 AND currency = ?");
+		
+		$stmt = $mysqli->prepare("SELECT sell FROM converter WHERE current = 1 AND currency = ?");
 		$stmt->bind_param("s", $out_currency);
 		$stmt->execute();
 		$buy_sum = $stmt->get_result()->fetch_row()[0];
 		$out_sum = $in_sum / $buy_sum;
 		
 		return standart_sum($out_sum);
+	}
+
+	function transaction($debit_accountnum, $credit_accountnum, $sum) {
+		$mysqli = get_sql_connection();
+		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
+			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
+		$sum = standart_sum($_POST["sum"]);	
+		$stmt->bind_param("ssss", $debit_accountnum, $credit_accountnum, $sum, $_SESSION["user"]["login"]);
+		$stmt->execute();
+	}
+	
+	function conversion($debit_accountnum, $credit_accountnum, $sum, $user) {
+		$mysqli = get_sql_connection();
+		$stmt = $mysqli->prepare("SELECT currency FROM account WHERE accountnum = ?");
+		$stmt->bind_param("s", $debit_accountnum);
+		$stmt->execute();
+		$debit_currency = $stmt->get_result()->fetch_row()[0];
+	        $stmt->bind_param("s", $credit_accountnum);
+		$stmt->execute();
+		$credit_currency = $stmt->get_result()->fetch_row()[0];
+
+		$stmt->prepare("SELECT accountnum FROM account WHERE accountnum LIKE '30303%' AND currency = ?");
+		$stmt->bind_param("s", $debit_currency);
+		$stmt->execute();
+		$convert_debit_accountnum = $stmt->get_result()->fetch_row()[0];
+		$stmt->bind_param("s", $credit_currency);
+		$stmt->execute();
+		$convert_credit_accountnum = $stmt->get_result()->fetch_row()[0];
+		$rub_currency = "810";
+		$stmt->bind_param("s", $rub_currency);
+		$stmt->execute();
+		$convert_rub_accountnum = $stmt->get_result()->fetch_row()[0]; 
+
+		$mysqli->query("BEGIN");
+	
+	 	$sum = standart_sum($sum);	
+		
+		$stmt = $mysqli->prepare("SELECT cost, buy FROM converter WHERE current = 1 AND currency = ?");
+		$stmt->bind_param("s", $debit_currency);
+		$stmt->execute();	
+		$data = $stmt->get_result()->fetch_row();
+		$debit_sum = $sum * $data[0] - $sum * $data[1];
+		$stmt = $mysqli->prepare("SELECT cost, sell FROM converter WHERE current = 1 AND currency = ?");
+		$stmt->bind_param("s", $credit_currency);
+		$stmt->execute();
+		$data = $stmt->get_result()->fetch_row();
+		$credit_sum = $sum * $data[1] - $sum * $data[0];
+		$bank_income_accountnum = "70601810500000000001";
+		$bank_income_sum = $debit_sum + $credit_sum;	
+                
+		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
+			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
+		$temp_sum = $sum + $debit_sum;
+		$stmt->bind_param("ssss", $debit_accountnum, $convert_debit_accountnum, $sum, $user);
+		$stmt->execute();
+
+		$conv_sum = convert_sum($sum, $debit_currency, $credit_currency);
+		$stmt->bind_param("ssss", $convert_credit_accountnum, $credit_accountnum, $conv_sum, $user);
+		$stmt->execute();
+
+		$stmt->bind_param("ssss", $convert_rub_accountnum, $bank_income_accountnum, $bank_income_sum, $user);
+		$stmt->execute();
+	
+                $mysqli->query("COMMIT");
+		
+		return;
 	}
 ?>
