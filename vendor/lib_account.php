@@ -11,13 +11,13 @@
 
 		echo $cnt;
 
-		// Ñòðóêòóðà áàíêîâñêîãî ñ÷åòà:
-		// 408 - ñ÷åò ôèç.ëèöà
-		// 00 - ðîä äåÿòåëüíîñòè äåðæàòåëÿ ñ÷åòà
-		// XXX - âàëþòà
-		// 1 - ïðîâåðî÷íûé êîä
-		// XXXX - îòäåëåíèå áàíêà (0000 - ãîëîâíîé îôèñ)
-		// XXXXXX - ïîðÿäêîâûé íîìåð ñ÷åòà áàíêà
+		// Ð¡Ñ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° Ð±Ð°Ð½ÐºÐ¾Ð²ÑÐºÐ¾Ð³Ð¾ ÑÑ‡ÐµÑ‚Ð°:
+		// 408 - ÑÑ‡ÐµÑ‚ Ñ„Ð¸Ð·.Ð»Ð¸Ñ†Ð°
+		// 00 - Ñ€Ð¾Ð´ Ð´ÐµÑÑ‚ÐµÐ»ÑŒÐ½Ð¾ÑÑ‚Ð¸ Ð´ÐµÑ€Ð¶Ð°Ñ‚ÐµÐ»Ñ ÑÑ‡ÐµÑ‚Ð°
+		// XXX - Ð²Ð°Ð»ÑŽÑ‚Ð°
+		// 1 - Ð¿Ñ€Ð¾Ð²ÐµÑ€Ð¾Ñ‡Ð½Ñ‹Ð¹ ÐºÐ¾Ð´
+		// XXXX - Ð¾Ñ‚Ð´ÐµÐ»ÐµÐ½Ð¸Ðµ Ð±Ð°Ð½ÐºÐ° (0000 - Ð³Ð¾Ð»Ð¾Ð²Ð½Ð¾Ð¹ Ð¾Ñ„Ð¸Ñ)
+		// XXXXXX - Ð¿Ð¾Ñ€ÑÐ´ÐºÐ¾Ð²Ñ‹Ð¹ Ð½Ð¾Ð¼ÐµÑ€ ÑÑ‡ÐµÑ‚Ð° Ð±Ð°Ð½ÐºÐ°
           
 		$cnt++;
 		$accountnum = $acc2p . $currency . "10001" . sprintf("%'.07d", $cnt);
@@ -34,7 +34,7 @@
 		return $accountnum;
 	}
 
-	function check_balance($accountnum) { // áàëàíñ ñ÷èòàåòñÿ íà êîíåö äíÿ
+	function check_balance($accountnum) { // Ð±Ð°Ð»Ð°Ð½Ñ ÑÑ‡Ð¸Ñ‚Ð°ÐµÑ‚ÑÑ Ð½Ð° ÐºÐ¾Ð½ÐµÑ† Ð´Ð½Ñ
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare("SELECT `sum`, dt FROM balance WHERE account = ? ORDER BY dt DESC LIMIT 1");
 		$stmt->bind_param("s", $accountnum);
@@ -72,7 +72,7 @@
 		$stmt->execute();
 		$cntaccount = $stmt->get_result()->fetch_row()[0];
 
-		$default = 1; // ñ÷åò ïî óìîë÷àíèþ äëÿ ïðèåìà ïåðåâîäîâ
+		$default = 1; // ÑÑ‡ÐµÑ‚ Ð¿Ð¾ ÑƒÐ¼Ð¾Ð»Ñ‡Ð°Ð½Ð¸ÑŽ Ð´Ð»Ñ Ð¿Ñ€Ð¸ÐµÐ¼Ð° Ð¿ÐµÑ€ÐµÐ²Ð¾Ð´Ð¾Ð²
 		if ($cntaccount > 0)
 			$default = 0;
 
@@ -89,7 +89,7 @@
 
 	function close_account($accountnum) {
 		if (check_balance($accountnum) != 0) 
-			return "Çàêðûòü ìîæíî òîëüêî ïóñòîé ñ÷åò.";       
+			return "Ð—Ð°ÐºÑ€Ñ‹Ñ‚ÑŒ Ð¼Ð¾Ð¶Ð½Ð¾ Ñ‚Ð¾Ð»ÑŒÐºÐ¾ Ð¿ÑƒÑÑ‚Ð¾Ð¹ ÑÑ‡ÐµÑ‚.";       
 			
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare("SELECT currency, `default`, idclient FROM account WHERE accountnum = ?");

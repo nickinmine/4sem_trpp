@@ -183,7 +183,7 @@
 		<div class="form-name"><p>Открытие вклада</p></div>
 		<form action="vendor/create_deposit.php" method="POST">
 			<div class="form-content"><p>Вид вклада</p>
-				<label><div class="select-block"><select name="type_accountnum" required>
+				<label><div class="select-block"><select name="type" required>
 					<option selected></option>
 					<?php echo out_deposit_box(); ?>
 				</select></div></label>
