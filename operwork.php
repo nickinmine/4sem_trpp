@@ -6,8 +6,8 @@
 	if (!$_SESSION['user']) {
 		header('Location: /');
 	}
-	if ($_SESSION['user']['role'] != 'admin' & $_SESSION['user']['role'] != 'operator') {
-		header('Location: /acc.php');
+	if (($_SESSION['user']['role'] != 'admin') & ($_SESSION['user']['role'] != 'operator')) {
+		header('Location: /');
 		$_SESSION['message'] = 'Отказано в доступе: несоответствие уровня доступа.';
 	}
 ?>
@@ -67,7 +67,7 @@
 				}
 				?>
 			</div>
-			<div><input class="button" type="submit" value="Создать"></div>
+			<div><input class="button" type="submit" value="Создать" title="Открыть новый счёт"></div>
 			<label class="report"><?php
 				echo $_SESSION["message-client"];
 				unset($_SESSION["message-client"]);
@@ -86,7 +86,7 @@
 				</select></div></label>
 			</div>
 			<div>
-				<input class="button" type="submit" value="Закрыть">
+				<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный счёт">
 			</div>
 			<label class="report"><?php
 				echo $_SESSION["message-close"];
@@ -109,7 +109,7 @@
 				<label>Сумма пополнения<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
-				<input class="button" type="submit" value="Пополнить">
+				<input class="button" type="submit" value="Пополнить" title="Пополнить выбранный счёт">
 			</div>
 			<label class="report"><?php
 				echo $_SESSION["message-push"];
@@ -132,7 +132,7 @@
 				<label>Сумма снятия<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
-				<input class="button" type="submit" value="Снять">
+				<input class="button" type="submit" value="Снять" title="Снять средства с выбранного счёта">
 			</div>
 			<label class="report"><?php
 				echo $_SESSION["message-pop"];
@@ -160,7 +160,7 @@
 				<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
-				<input class="button" type="submit" value="Перевести">
+				<input class="button" type="submit" value="Перевести" title="Перевести со счёта на счёт">
 			</div>
 			<label class="report"><?php
 				echo $_SESSION["message-transaction_in"];
@@ -185,7 +185,7 @@
 				<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
-				<input class="button" type="submit" value="Перевести">
+				<input class="button" type="submit" value="Перевести" title="Перевести средства на выбранный счёт получателя">
 			</div>
 			<label class="report"><?php
 				echo $_SESSION["message-transaction_out"];
@@ -233,7 +233,7 @@
 			<label>Электронная почта</label>
 			<label><input type="email" name="email" placeholder="example@email.com" <?php echo out_value("email"); ?>></label>  
 
-			<input class="button" type="submit" value="Сохранить">     
+			<input class="button" type="submit" value="Сохранить" title="Сохранить изменения персональных данных клиента">
 			<label class="report"><?php
                 		echo $_SESSION['message-edit'];
                 		unset($_SESSION['message-edit']);

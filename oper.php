@@ -6,8 +6,8 @@
 	if (!$_SESSION['user']) {
 		header('Location: /');
 	}
-	if ($_SESSION['user']['role'] != 'admin' & $_SESSION['user']['role'] != 'operator') {
-		header('Location: /acc.php');
+	if (($_SESSION['user']['role'] != 'admin') & ($_SESSION['user']['role'] != 'operator')) {
+		header('Location: /');
 		$_SESSION['message'] = 'Отказано в доступе: несоответствие уровня доступа.';
 	}
 ?>
@@ -47,7 +47,7 @@
 		<form action="vendor/find_client_by_passport.php" method="POST">
 			<label>Номер паспорта</label>
 			<label><input pattern="^[0-9]{4} [0-9]{6}$" name="passport" required="required" placeholder="Серия и номер"></label>
-			<input class="button" type="submit" value="Начать">
+			<input class="button" type="submit" value="Поиск" title="Начать поиск клиента по номеру паспорта">
 			<label class="message"><?php
 				echo $_SESSION["message-client"];
 				unset($_SESSION["message-client"]);
@@ -93,7 +93,7 @@
 			<label>Электронная почта</label>
 			<label><input type="email" name="email" placeholder="example@email.com"></label>  
 
-			<input class="button" type="submit" value="Создать">     
+			<input class="button" type="submit" value="Создать" title="Создать новый профиль клиента">
 			<label class="message"><?php
                 		echo $_SESSION['message-create-client'];
                 		unset($_SESSION['message-create-client']);

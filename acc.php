@@ -6,8 +6,8 @@
 	if (!$_SESSION['user']) {
 		header('Location: /');
 	}
-	if ($_SESSION['user']['role'] != 'admin' & $_SESSION['user']['role'] != 'accountant') {
-		header('Location: /oper.php');
+	if (($_SESSION['user']['role'] != 'admin') & ($_SESSION['user']['role'] != 'accountant')) {
+		header('Location: /');
 		$_SESSION['message'] = 'Отказано в доступе: несоответствие уровня доступа.';
 	}
 ?>
@@ -54,7 +54,7 @@
 			<label>Дата нового открытого дня</label>
 			<label><input type="date" name="date"></label>
 
-			<input class="button" type="submit" value="Установить">	 
+			<input class="button" type="submit" value="Установить" title="Установить указанный день как текущий">
 			<label class="message"><?php
 				echo $_SESSION['message-operdate'];
 				unset($_SESSION['message-operdate']);
@@ -81,7 +81,7 @@
 				<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
-				<input class="button" type="submit" value="Перевести">
+				<input class="button" type="submit" value="Перевести" title="Перевести указанную сумму между счетами банка">
 			</div>
 			<label class="report"><?php
 				echo $_SESSION["message-transaction_acc"];
@@ -109,7 +109,7 @@
 			<div><label>Стоимость покупки в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="buy_sum" required placeholder="100.00"></label></div>
 			<div><label>Стоимость, установленная ЦБ в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="cost_sum" required placeholder="100.00"></label></div>
 			<div><label>Стоимость продажи в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="sell_sum" required placeholder="100.00"></label></div>
-			<div><input class="button" type="submit" value="Обновить"></div>
+			<div><input class="button" type="submit" value="Обновить" title="Обновить текущий курс валют"></div>
 			<label class="report"><?php
 				echo $_SESSION["message-currency_cost"];
 				unset($_SESSION["message-currency_cost"]);

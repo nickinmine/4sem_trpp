@@ -1,8 +1,11 @@
 <?php
     session_start();
-    if ($_SESSION['user']) {
-        header('Location: main.php');
-    }
+	if (($_SESSION["user"]["role"] == "admin") || ($_SESSION["user"]["role"] == "operator")) {
+		header('Location: /oper.php');
+	}
+	else if ($_SESSION["user"]["role"] == "accountant") {
+		header('Location: /acc.php');
+	}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +21,7 @@
 <div class="app-router-container">
     <div class="auth-form">
         <form action="vendor/signin.php" method="post">
-            <p class="form-name">Название системы версия beta-1.3.6</p>
+            <p class="form-name">ТРПП Банк<br>версия beta-1.3.6</p>
             <label>Логин</label>
             <label>
                 <input type="text" name="login" placeholder="Введите логин" required>
@@ -27,7 +30,8 @@
             <label>
                 <input type="password" name="pass" placeholder="Введите пароль" required>
             </label>
-            <button type="submit">Войти</button>
+            <label><a href="" title="Это Ваши проблемы. Напишите пароль себе на лбу в следующий раз">Забыли пароль?</a></label>
+            <button type="submit" title="Вход в систему">Войти</button>
             <label class="message"><?php
                 echo $_SESSION['message-auth'];
                 unset($_SESSION['message-auth']);
