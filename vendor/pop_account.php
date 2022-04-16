@@ -1,7 +1,7 @@
 <?php
-	session_start();
+	require "lib.php";
 
-	require "lib.php";      
+	safe_session_start();                            
 	
 	$mysqli = get_sql_connection();
 	$stmt = $mysqli->prepare("SELECT accountnum FROM account WHERE idclient = 1 AND accountnum LIKE '20202%' AND currency = (" .

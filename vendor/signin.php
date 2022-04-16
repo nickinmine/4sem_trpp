@@ -1,7 +1,7 @@
 <?php
-	session_start();
-	
-	require "lib.php";	
+	require "lib.php";
+
+	safe_session_start();	                   	
 
 	$login = $_POST['login'];
 	$pass = md5($_POST['pass']);

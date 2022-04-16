@@ -1,7 +1,7 @@
 ﻿<?php
-	session_start();
-
 	require "lib.php";
+
+	safe_session_start();
 
         $mysqli = get_sql_connection();
 	$current_date = $mysqli->query("SELECT operdate FROM operdays WHERE current = 1")->fetch_row()[0];

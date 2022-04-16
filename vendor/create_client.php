@@ -1,7 +1,7 @@
 <?php
-	session_start();
-
 	require "lib.php";
+
+	safe_session_start();
 
 	$mysqli = get_sql_connection();
 	$stmt = $mysqli->prepare("INSERT INTO clients (name, email, birthdate, passport, address, phone, passgiven, passcode, passdate, sex, birthplace, reg) " .

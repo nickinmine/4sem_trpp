@@ -1,19 +1,16 @@
 <?php   
+	function safe_session_start() {
+		if(!isset($_SESSION))
+			session_start(); 
+	}
+
 	function get_sql_connection() {
-		session_start();
-		mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);  // отладочный вывод
+		safe_session_start();
 		//if (!array_key_exists("connection", $_SESSION)) {
-		$_SESSION["connection"] = new mysqli("localhost", "root", "", "bankbase");
+			$_SESSION["connection"] = new mysqli("localhost", "root", "", "bankbase");
 		//}
 		return $_SESSION["connection"];
 	}
-	
-	/*function out_header_menu($role) {
-		if ($role == "admin" || $role == "operator")
-			echo '<div class="subbutton" onclick="document.location.href="oper.php"">Оператор</div>';
-		if ($role == "admin" || $role == "accountant")
-			echo '<div class="subbutton" onclick="document.location.href="acc.php"">Бухгалтер</div>';
-	}*/
 
 	function addlog($str) {
 		$logfile = "..\\!log.txt";
@@ -22,6 +19,16 @@
 			fwrite($fd, date("Y-m-d H:i:s") . " " . $str . "\r\n");
 			fclose($fd);
 		}
+	}
+
+	function session_message($key) {
+		safe_session_start();
+		$str = "";
+		if (array_key_exists($key, $_SESSION)) {
+	        	$str = $_SESSION[$key];
+		        unset($_SESSION[$key]);
+		}
+		return $str;
 	}
 
 	function out_account_box($idclient) {
@@ -133,7 +140,7 @@
 	}
 
 	function out_value($data) {
-		session_start();
+		safe_session_start();
 		$id = $_SESSION["client"]["id"];
 		$mysqli = get_sql_connection();                 
 		$stmt = $mysqli->prepare("SELECT " . $data . " FROM clients WHERE id = ?");

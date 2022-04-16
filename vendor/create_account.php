@@ -1,7 +1,7 @@
 <?php
-	session_start();
-
 	require "lib.php";
+
+	safe_session_start();
 
 	$idclient = (int)$_SESSION["client"]["id"];
 	$currency = $_POST["currency"];

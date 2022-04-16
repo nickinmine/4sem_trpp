@@ -1,7 +1,7 @@
 <?php
 	require "lib.php";
 
-	session_start();
+	safe_session_start();
 
 	if (substr($_POST["accountnum"], 0, 5) != "40800") {
 		$_SESSION["message-close"] = "Невозможно закрыть служебный счет.";
@@ -20,7 +20,7 @@
 	$data = $stmt->get_result()->fetch_row();
 	$currency = $data[0];
 	$default = $data[1];
-	$isclient = $data[2];
+	$idclient = $data[2];
 	
 	$stmt = $mysqli->prepare("SELECT count(*) FROM account WHERE idclient = ? AND closed = '0000-00-00' AND currency = ?");
 	$stmt->bind_param("is", $idclient, $currency);
