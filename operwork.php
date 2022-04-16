@@ -1,8 +1,8 @@
 <?php
-	session_start();
-	
 	require "vendor/lib.php";
-	
+
+	safe_session_start(); 
+
 	if (!$_SESSION['user']) {
 		header('Location: /');
 	}
@@ -68,10 +68,7 @@
 				?>
 			</div>
 			<div><input class="button" type="submit" value="Создать" title="Открыть новый счёт"></div>
-			<label class="report"><?php
-				echo $_SESSION["message-client"];
-				unset($_SESSION["message-client"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-client"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -88,10 +85,7 @@
 			<div>
 				<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный счёт">
 			</div>
-			<label class="report"><?php
-				echo $_SESSION["message-close"];
-				unset($_SESSION["message-close"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-close"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -111,10 +105,7 @@
 			<div>
 				<input class="button" type="submit" value="Пополнить" title="Пополнить выбранный счёт">
 			</div>
-			<label class="report"><?php
-				echo $_SESSION["message-push"];
-				unset($_SESSION["message-push"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-push"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -134,10 +125,7 @@
 			<div>
 				<input class="button" type="submit" value="Снять" title="Снять средства с выбранного счёта">
 			</div>
-			<label class="report"><?php
-				echo $_SESSION["message-pop"];
-				unset($_SESSION["message-pop"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-pop"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -162,10 +150,7 @@
 			<div>
 				<input class="button" type="submit" value="Перевести" title="Перевести со счёта на счёт">
 			</div>
-			<label class="report"><?php
-				echo $_SESSION["message-transaction_in"];
-				unset($_SESSION["message-transaction_in"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-transaction_in"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -187,10 +172,7 @@
 			<div>
 				<input class="button" type="submit" value="Перевести" title="Перевести средства на выбранный счёт получателя">
 			</div>
-			<label class="report"><?php
-				echo $_SESSION["message-transaction_out"];
-				unset($_SESSION["message-transaction_out"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-transaction_out"); ?></label>
 		</form>
 	</div>
        	<div class="form">
@@ -234,10 +216,7 @@
 			<label><input type="email" name="email" placeholder="example@email.com" <?php echo out_value("email"); ?>></label>  
 
 			<input class="button" type="submit" value="Сохранить" title="Сохранить изменения персональных данных клиента">
-			<label class="report"><?php
-                		echo $_SESSION['message-edit'];
-                		unset($_SESSION['message-edit']);
-                	?></label>
+			<label class="report"><?php echo session_message("message-edit"); ?></label>
 		</form>
 	</div>
 </main>

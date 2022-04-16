@@ -1,7 +1,7 @@
 <?php
 	require "vendor/lib.php";
 
-	session_start();
+	safe_session_start();
 	
 	if (!$_SESSION['user']) {
 		header('Location: /');
@@ -48,10 +48,7 @@
 			<label>Номер паспорта</label>
 			<label><input pattern="^[0-9]{4} [0-9]{6}$" name="passport" required="required" placeholder="Серия и номер"></label>
 			<input class="button" type="submit" value="Поиск" title="Начать поиск клиента по номеру паспорта">
-			<label class="message"><?php
-				echo $_SESSION["message-client"];
-				unset($_SESSION["message-client"]);
-			?></label>
+			<label class="message"><?php echo session_message("message-client"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -94,10 +91,7 @@
 			<label><input type="email" name="email" placeholder="example@email.com"></label>  
 
 			<input class="button" type="submit" value="Создать" title="Создать новый профиль клиента">
-			<label class="message"><?php
-                		echo $_SESSION['message-create-client'];
-                		unset($_SESSION['message-create-client']);
-                	?></label>
+			<label class="message"><?php echo session_message("message-create-client"); ?></label>
 		</form>
 	</div>
 

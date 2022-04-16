@@ -1,7 +1,7 @@
 <?php
-	session_start();
-
 	require "vendor/lib.php";
+
+	safe_session_start();
 	
 	if (!$_SESSION['user']) {
 		header('Location: /');
@@ -55,10 +55,7 @@
 			<label><input type="date" name="date"></label>
 
 			<input class="button" type="submit" value="Установить" title="Установить указанный день как текущий">
-			<label class="message"><?php
-				echo $_SESSION['message-operdate'];
-				unset($_SESSION['message-operdate']);
-			?></label>
+			<label class="message"><?php echo session_message("message-operdate"); ?></label>
 		</form>
 	</div>
 	<div class="form">
@@ -83,10 +80,7 @@
 			<div>
 				<input class="button" type="submit" value="Перевести" title="Перевести указанную сумму между счетами банка">
 			</div>
-			<label class="report"><?php
-				echo $_SESSION["message-transaction_acc"];
-				unset($_SESSION["message-transaction_acc"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-transaction_acc"); ?></label>
 		</form>
 	</div>
         <div class="form">
@@ -110,10 +104,7 @@
 			<div><label>Стоимость, установленная ЦБ в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="cost_sum" required placeholder="100.00"></label></div>
 			<div><label>Стоимость продажи в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="sell_sum" required placeholder="100.00"></label></div>
 			<div><input class="button" type="submit" value="Обновить" title="Обновить текущий курс валют"></div>
-			<label class="report"><?php
-				echo $_SESSION["message-currency_cost"];
-				unset($_SESSION["message-currency_cost"]);
-			?></label>
+			<label class="report"><?php echo session_message("message-currency_cost"); ?></label>
 		</form>
 	</div>
 
