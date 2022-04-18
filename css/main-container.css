@@ -1,0 +1,11 @@
+.main-container{
+	display: flex;
+}
+.main-container>.column1,
+.main-container>.column2{
+	flex-direction: column;
+	width: 100%;
+}
+.main-container>.air{
+	margin: 5%;
+}
