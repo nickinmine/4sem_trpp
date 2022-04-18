@@ -1,24 +1,32 @@
 .subbutton{
-    margin-top: 5px;
-    margin-bottom: 5px;
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 .subbutton:hover{
-    color: #a81aee;
-    cursor: pointer;
+	color: #a81aee;
+	cursor: pointer;
 }
 .role-name{
-    font-size: 20px;
+	font-size: 20px;
 }
 .exit-button{
-    font-size: 24px;
+	font-size: 24px;
 }
 .header-container{
-    position: relative;
-    margin: 0px;
-    display: flex;
-    padding: 10px 20px;
-    align-items: center;
-    min-height: 50px;
-    justify-content: space-between;
-    color: black;
+	position: relative;
+	margin: 0px;
+	display: flex;
+	padding: 10px 20px;
+	align-items: center;
+	min-height: 50px;
+	justify-content: space-between;
+	color: black;
+}
+.role-name-container>.role-name,
+.role-name-container>.client-info{
+	text-align: center;
+	font-size: 16px;
+}
+.role-name-container>.role-name{
+	margin-top: 10px;
 }
