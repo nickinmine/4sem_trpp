@@ -1,8 +1,8 @@
 <?php
-	session_start();
-	
 	require "vendor/lib.php";
-	
+
+	safe_session_start();
+
 	if (!$_SESSION['user']) {
 		header('Location: /');
 	}
@@ -101,10 +101,7 @@
 					<label><input type="email" name="email" placeholder="example@email.com" <?php echo out_value("email"); ?>></label>
 
 					<input class="button" type="submit" value="Сохранить" title="Сохранить изменения персональных данных клиента">
-					<label class="report"><?php
-							echo $_SESSION['message-edit'];
-							unset($_SESSION['message-edit']);
-						?></label>
+					<label class="report"><?php echo session_message("message-edit"); ?></label>
 				</form>
 			</div>
 
@@ -126,10 +123,7 @@
 						?>
 					</div>
 					<div><input class="button" type="submit" value="Создать" title="Открыть новый счёт"></div>
-					<label class="report"><?php
-							echo $_SESSION["message-client"];
-							unset($_SESSION["message-client"]);
-						?></label>
+					<label class="report"><?php echo session_message("message-client"); ?></label>
 				</form>
 			</div>
 
@@ -147,10 +141,7 @@
 					<div>
 						<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный счёт">
 					</div>
-					<label class="report"><?php
-							echo $_SESSION["message-close"];
-							unset($_SESSION["message-close"]);
-						?></label>
+					<label class="report"><?php echo session_message("message-close"); ?></label>
 				</form>
 			</div>
 		</div>
@@ -172,10 +163,7 @@
 					<div>
 						<input class="button" type="submit" value="Пополнить" title="Пополнить выбранный счёт">
 					</div>
-					<label class="report"><?php
-							echo $_SESSION["message-push"];
-							unset($_SESSION["message-push"]);
-						?></label>
+					<label class="report"><?php echo session_message("message-push"); ?></label>
 				</form>
 			</div>
 
@@ -196,10 +184,7 @@
 					<div>
 						<input class="button" type="submit" value="Снять" title="Снять средства с выбранного счёта">
 					</div>
-					<label class="report"><?php
-							echo $_SESSION["message-pop"];
-							unset($_SESSION["message-pop"]);
-						?></label>
+					<label class="report"><?php echo session_message("message-pop"); ?></label>
 				</form>
 			</div>
 
@@ -225,10 +210,7 @@
 					<div>
 						<input class="button" type="submit" value="Перевести" title="Перевести со счёта на счёт">
 					</div>
-					<label class="report"><?php
-							echo $_SESSION["message-transaction_in"];
-							unset($_SESSION["message-transaction_in"]);
-						?></label>
+					<label class="report"><?php echo session_message("message-transaction_in"); ?></label>
 				</form>
 			</div>
 
@@ -257,6 +239,31 @@
 						?></label>
 				</form>
 			</div>
+            <div class="form">
+                <a class="anchor" id="create_deposit"></a>
+                <div class="form-name"><p>Открытие вклада</p></div>
+                <form action="vendor/create_deposit.php" method="POST">
+                    <div class="form-content"><p>Вид вклада</p>
+                        <label><div class="select-block"><select name="type" required>
+                                    <option selected></option>
+									<?php echo out_deposit_box(); ?>
+                                </select></div></label>
+                    </div>
+                    <div class="form-content"><p>Средства для вклада будут взяты со счета</p>
+                        <label><div class="select-block"><select name="debit_accountnum" required>
+                                    <option selected></option>
+									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+                                </select></div></label>
+                    </div>
+                    <div>
+                        <label>Сумма вклада<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+                    </div>
+                    <div>
+                        <input class="button" type="submit" value="Открыть" title="Открыть выбранный вклад">
+                    </div>
+                    <label class="report"><?php echo session_message("message-create_deposit"); ?></label>
+                </form>
+            </div>
 		</div>
 		<div class="air"></div>
 	</div>

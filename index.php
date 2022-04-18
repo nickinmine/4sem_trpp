@@ -1,5 +1,7 @@
 <?php
-	session_start();
+	require "vendor/lib.php";
+
+	safe_session_start();
 	if (($_SESSION["user"]["role"] == "admin") || ($_SESSION["user"]["role"] == "operator")) {
 		header('Location: /oper.php');
 	}
@@ -30,12 +32,9 @@
 			<label>
 				<input type="password" name="pass" placeholder="Введите пароль" required>
 			</label>
-			<label><a href="" title="Это Ваши проблемы. Напишите пароль себе на лбу в следующий раз">Забыли пароль?</a></label>
+			<label><a href="" title="Это исключительно Ваши проблемы.">Забыли пароль?</a></label>
 			<button type="submit" title="Вход в систему">Войти</button>
-			<label class="message"><?php
-				echo $_SESSION['message-auth'];
-				unset($_SESSION['message-auth']);
-				?></label>
+			<label class="message"><?php echo session_message("message-auth"); ?></label>
 		</form>
 	</div>
 </div>
