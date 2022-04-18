@@ -123,7 +123,6 @@
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
 			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
-		$sum = standart_sum($_POST["sum"]);	
 		$stmt->bind_param("ssss", $debit_accountnum, $credit_accountnum, $sum, $user);
 		if (!$stmt->execute())
 			return $mysqli->error;
@@ -187,5 +186,14 @@
 		return;
 	}
 
+	function modify_date($date, $oper) {
+		if ($oper == NULL) {
+			return "6000-01-01";
+		}
+		$datetime = new DateTime($date);
+		$datetime->modify($oper);
+		return $datetime->format('Y-m-d');      
+	}
+	
 	
 ?>

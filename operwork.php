@@ -238,31 +238,31 @@
 						?></label>
 				</form>
 			</div>
-            <div class="form">
-                <a class="anchor" id="create_deposit"></a>
-                <div class="form-name"><p>Открытие вклада</p></div>
-                <form action="vendor/create_deposit.php" method="POST">
-                    <div class="form-content"><p>Вид вклада</p>
-                        <label><div class="select-block"><select name="type" required>
-				<option selected></option>
-				<?php echo out_deposit_box(); ?>
-			</select></div></label>
-                    </div>
-                    <div class="form-content"><p>Средства для вклада будут взяты со счета</p>
-                        <label><div class="select-block"><select name="debit_accountnum" required>
-				<option selected></option>
-				<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-			</select></div></label>
-                    </div>
-                    <div>
-                        <label>Сумма вклада<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
-                    </div>
-                    <div>
-                        <input class="button" type="submit" value="Открыть" title="Открыть выбранный вклад">
-                    </div>
-                    <label class="report"><?php echo session_message("message-create_deposit"); ?></label>
-                </form>
-            </div>
+			<div class="form">
+				<a class="anchor" id="create_deposit"></a>
+				<div class="form-name"><p>Открытие вклада</p></div>
+				<form action="vendor/create_deposit.php" method="POST">
+					<div class="form-content"><p>Вид вклада</p>
+						<label><div class="select-block"><select name="type" required>
+							<option selected></option>
+							<?php echo out_deposit_box(); ?>
+						</select></div></label>
+					</div>
+					<div class="form-content"><p>Средства для вклада будут взяты со счета</p>
+						<label><div class="select-block"><select name="debit_accountnum" required>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
+					</div>
+                    			<div>
+						<label>Сумма вклада<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+					</div>
+					<div>
+						<input class="button" type="submit" value="Открыть" title="Открыть выбранный вклад">
+					</div>
+					<label class="report"><?php echo session_message("message-create_deposit"); ?></label>
+				</form>
+			</div>
 		</div>
 		<div class="air"></div>
 	</div>

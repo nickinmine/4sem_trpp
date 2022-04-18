@@ -27,7 +27,14 @@
 		$stmt->execute();
 	}
 	// пересчет процентов по вкладам
-	
+	$deposits = $mysqli->query("SELECT id FROM deposits");
+	foreach ($deposits as $id) {
+		$res = update_deposit($id, $new_date, $_SESSION["user"]["login"]);
+		if ($res != "") {
+			$_SESSION['message-operdate'] = "Ошибка при пересчете вкладов.\n" . $res;
+			header('Location: ../acc.php#change_operdate');
+		}
+	}
 	// обновление даты
 	$mysqli->query("UPDATE operdays SET current = 0 WHERE current = 1");
 	$stmt = $mysqli->prepare("INSERT INTO operdays (operdate, current) VALUES (?, 1)");

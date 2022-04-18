@@ -43,8 +43,68 @@
 		return "";
 	}
 
-	function update_deposit($id, ) {
-		
+	function update_deposit($id, $newdate, $user) {
+		$mysqli = get_sql_connection();
+		$stmt = $mysqli->prepare("SELECT * FROM deposits WHERE id = ?");
+		$stmt->bind_param("i", $id);
+		if (!$stmt->execute()) {
+			return $mysqli->error;
+		}
+		$res = $stmt->get_result()->fetch_row();
+		$idclient = $res[1];
+		$type = $res[2];
+		$opendate = $res[3];
+		$closedate = $res[4];
+		$mainacc = $res[5];
+		$percacc = $res[6];
+		$update = $res[7];
+		if ($closedate != "0000-00-00")	{
+			return "Этот вклад уже закрыт.";
+		}
+		$stmt = $mysqli->prepare("SELECT `modify` FROM capterms WHERE cap = (SELECT cap FROM depositeterms WHERE `type` = ?)");
+		$stmt->bind_param("s", $type);
+		if (!$stmt->execute()) {
+			return $mysqli->error;
+		}
+		$modify = $stmt->get_result()->fetch_row()[0];
+		$stmt = $mysqli->prepare("SELECT monthcnt FROM depositeterms WHERE `type` = ?");
+		$stmt->bind_param("s", $type);
+		if (!$stmt->execute()) {
+			return $mysqli->error;
+		}
+		$monthcnt = $stmt->get_result()->fetch_row()[0];
+                $stmt = $mysqli->prepare("SELECT rate FROM depositeterms WHERE `type` = ?");
+		$stmt->bind_param("s", $type);
+		if (!$stmt->execute()) {
+			return $mysqli->error;
+		}
+		$rate = $stmt->get_result()->fetch_row()[0];
+		if ($type == "save1y") {
+			$cnt = 0;
+			while (modify_date($update, $modify) <= $newdate && modify_date($update, $modify) <= modify_date($opendate, "+" . $monthcnt . " month")) {
+				$update = modify_date($update, $modify);
+				$cnt++;
+				$sum = standart_sum((check_balance($mainacc) + check_balance($percacc)) * $rate / 100 / 12);
+				$res = transaction("70601810500000000001", $percacc, $sum, $user);
+				if ($res != "") {
+					return $mysqli->error;
+				}
+				
+			}
+			return "";
+		}
+		if ($type == "ben1y") {
+			if ($update < modify_date($opendate, "+" . $monthcnt . " month")) {
+				return "";
+			}
+			$sum = standart_sum(check_balance($mainacc) * $rate / 100 / 12);
+			$res = transaction("70601810500000000001", $percacc, $sum, $user);
+			if ($res != "") {
+				return $mysqli->error;
+			}
+			return "";
+		} 
+		return $type;                            			
 	}
 	
 ?>
