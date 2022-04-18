@@ -20,19 +20,12 @@
 		$data = $stmt->get_result()->fetch_row();
 		$idclient = $data[0];
 		$currency = $data[1];
-		create_account($idclient, $currency, "47423", "Основной счет вклада");
-		$stmt = $mysqli->prepare("SELECT accountnum FROM account WHERE idclient = ? AND accountnum LIKE '47423%'");	
-		$stmt->bind_param("i", $idclient);
-		if (!$stmt->execute())
-			return $mysqli->error;
-		$mainacc = $stmt->get_result()->fetch_row()[0];
-		create_account($idclient, $currency, "47411", "Дополнительный счет вклада");
-		$stmt = $mysqli->prepare("SELECT accountnum FROM account WHERE idclient = ? AND accountnum LIKE '47411%'");	
-		$stmt->bind_param("i", $idclient);
-		if (!$stmt->execute())
-			return $mysqli->error;
-		$percacc = $stmt->get_result()->fetch_row()[0];
-		transaction($debit_accountnum, $mainacc, $sum, $user);
+		$mainacc = "";
+		create_account($idclient, $currency, "42301", "Основной счет вклада", $mainacc);                                
+		$percacc = "";
+		create_account($idclient, $currency, "47411", "Дополнительный счет вклада", $percacc);
+		$res = transaction($debit_accountnum, $mainacc, $sum, $user);
+		/// !!!
 		$stmt = $mysqli->prepare("INSERT INTO deposits (idclient, type, opendate, closedate, sum, mainacc, percacc) " . 
 			"VALUES (?, ?, (SELECT operdate FROM operdays WHERE current = 1), '0000-00-00', ?, ?, ?)");
 		$stmt->bind_param("issss", $idclient, $type, $sum, $mainacc, $percacc);

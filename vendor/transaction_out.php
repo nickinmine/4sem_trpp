@@ -19,11 +19,6 @@
 		header("Location: ../operwork.php#transaction_out");
 		return;
 	}
-	if (check_balance($_POST["debit_accountnum"]) - $_POST["sum"] < 0) {
-		$_SESSION["message-transaction_out"] = "Перевод не выполнен. Недостаточно средств.";
-		header("Location: ../operwork.php#transaction_out");
-		return;
-	}
 	$stmt = $mysqli->prepare("SELECT accountnum FROM account WHERE idclient = ? AND currency = (" .
 		"SELECT currency FROM account WHERE accountnum = ? AND closed = '0000-00-00' " .
 		") AND closed = '0000-00-00' AND `default` = 1");
@@ -45,7 +40,12 @@
         	header("Location: ../operwork.php#transaction_out");
 		return;                               
 	}                                                          
-	transaction($_POST["debit_accountnum"], $credit_accountnum, $_POST["sum"], $_SESSION["user"]["login"]);		
+	$res = transaction($_POST["debit_accountnum"], $credit_accountnum, $_POST["sum"], $_SESSION["user"]["login"]);
+	if ($res != "") {
+		$_SESSION["message-transaction_out"] = "Успешный перевод.";
+	        header("Location: ../operwork.php#transaction_out");
+		return;	
+	}		
 	$_SESSION["message-transaction_out"] = "Успешный перевод.";
         header("Location: ../operwork.php#transaction_out");
 		

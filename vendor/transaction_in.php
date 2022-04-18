@@ -24,18 +24,18 @@
         	header("Location: ../operwork.php#transaction_in");
 		return;
 	}
-	if (check_balance($debit_accountnum) - $sum < 0) {
-		$_SESSION["message-transaction_in"] = "Перевод не выполнен. Недостаточно средств.";
-		header("Location: ../operwork.php#transaction_in");
-		return;
-	}	
 	if ($debit_currency != $credit_currency) {
 		conversion($debit_accountnum, $credit_accountnum, $sum, $_SESSION["user"]["login"]);
                 $_SESSION["message-transaction_in"] = "Успешный перевод с конвертацией валют.";
         	header("Location: ../operwork.php#transaction_in");
 		return;
 	}
-	transaction($debit_accountnum, $credit_accountnum, $sum, $_SESSION["user"]["login"]);	
+	$res = transaction($debit_accountnum, $credit_accountnum, $sum, $_SESSION["user"]["login"]);
+	if ($res != "")	{
+		$_SESSION["message-transaction_in"] = "Ошибка перевода. " . $res;
+        	header("Location: ../operwork.php#transaction_in");
+		return;	
+	}
 	$_SESSION["message-transaction_in"] = "Успешный перевод.";
         header("Location: ../operwork.php#transaction_in");
 		

@@ -62,7 +62,7 @@
 		return $sum;   
 	}
 
-	function create_account($idclient, $currency, $acc2p, $descript) {
+	function create_account($idclient, $currency, $acc2p, $descript, &$res_account = NULL) {
 		$accountnum = generate_accountnum($acc2p, $currency);
 		
 		$mysqli = get_sql_connection();
@@ -84,6 +84,7 @@
 			return $mysqli->error;
 		}
 
+		$res_account = $accountnum;
 		return "";
 	}
 

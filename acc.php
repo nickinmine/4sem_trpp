@@ -65,13 +65,13 @@
 			<div class="form-content"><p>Счет отправки перевода</p>
 				<label><div class="select-block"><select name="debit_accountnum" required>
 					<option selected></option>
-					<?php echo out_account_box(1); ?>
+					<?php echo out_account_box(1, "out_acc"); ?>
 				</select></div></label>
 			</div>
 			<div class="form-content"><p>Счет приема перевода</p>
 				<label><div class="select-block"><select name="credit_accountnum" required>
 					<option selected></option>
-					<?php echo out_account_box(1); ?>
+					<?php echo out_account_box(1, "out_acc"); ?>
 				</select></div></label>
 			</div>
 			<div>

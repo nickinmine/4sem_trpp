@@ -34,10 +34,15 @@
 		return $str;
 	}
 
-	function out_account_box($idclient) {
+	function out_account_box($idclient, $descript = "", $out_null = false) {
 		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare('SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency ' . 
-			'WHERE closed = "0000-00-00" AND idclient = ?');
+		$stmt = $mysqli->prepare("SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency " . 
+			"WHERE closed = '0000-00-00' AND idclient = ? AND accountnum LIKE '40800%'");
+		if ($descript == "out_acc") {
+			$stmt = $mysqli->prepare("SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency " . 
+				"WHERE closed = '0000-00-00' AND idclient = ?");
+		}
+			
 		$stmt->bind_param("i", $idclient);
 		$stmt->execute();
 		$result = $stmt->get_result();
@@ -47,10 +52,11 @@
 			$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
 			$stmt->bind_param("s", $res["accountnum"]);
 			$stmt->execute();
-			$type = $stmt->get_result()->fetch_row()[0];
-			$sign = ($type == "active" ? 1 : -1);	
-			$str .= '<option value = "' . $res["accountnum"] . '">Счет №' . $res["accountnum"] . ': ' 
-				. sprintf("%.2f", $sign * check_balance($res["accountnum"])) . ' ' . $res["isocode"] . ', ' . $res["descript"] . '</option>';
+			$sign = ($stmt->get_result()->fetch_row()[0]) == "active" ? 1 : -1;
+			$balance = $sign * check_balance($res["accountnum"]);
+			if (!$out_null || ($out_null && $balance == 0))
+				$str .= '<option value = "' . $res["accountnum"] . '">Счет №' . $res["accountnum"] . ': ' 
+					. sprintf("%.2f", $balance) . ' ' . $res["isocode"] . ', ' . $res["descript"] . '</option>';	                                       	
 		}
 		return $str;
 	}
@@ -112,12 +118,16 @@
 	}
 
 	function transaction($debit_accountnum, $credit_accountnum, $sum, $user) {
+		if (check_balance($debit_accountnum) < $sum) 
+			return "Недостаточно средств на счете";
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
 			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
 		$sum = standart_sum($_POST["sum"]);	
 		$stmt->bind_param("ssss", $debit_accountnum, $credit_accountnum, $sum, $user);
-		$stmt->execute();
+		if (!$stmt->execute())
+			return $mysqli->error;
+		return "";
 	}
 	
 	function conversion($debit_accountnum, $credit_accountnum, $sum, $user) {

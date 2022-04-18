@@ -79,7 +79,7 @@
 				<p>Выберите счет</p>
 				<label><div class="select-block"><select name="accountnum" required>
 					<option selected></option>
-					<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+					<?php echo out_account_box($_SESSION["client"]["id"], "", true); ?>
 				</select></div></label>
 			</div>
 			<div>

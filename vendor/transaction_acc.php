@@ -19,11 +19,6 @@
 		$_SESSION["message-transaction_acc"] = "Выберите разные счета.";
         	header("Location: ../acc.php#transaction_acc");
 		return;
-	}
-	if (check_balance($_POST["debit_accountnum"]) - $_POST["sum"] < 0) {
-		$_SESSION["message-transaction_acc"] = "Перевод не выполнен. Недостаточно средств.";
-		header("Location: ../acc.php#transaction_acc");
-		return;
 	}	
 	if ($credit_currency != $debit_currency) {        
 		conversion($_POST["debit_accountnum"], $_POST["credit_accountnum"], $_POST["sum"], $_SESSION["user"]["login"]);
@@ -31,7 +26,12 @@
         	header("Location: ../acc.php#transaction_acc");
 		return;
 	}
-	transaction($_POST["debit_accountnum"], $_POST["credit_accountnum"], $_POST["sum"], $_SESSION["user"]["login"]);	
+	$res = transaction($_POST["debit_accountnum"], $_POST["credit_accountnum"], $_POST["sum"], $_SESSION["user"]["login"]);
+	if ($res != "") {
+		$_SESSION["message-transaction_acc"] = "Ошибка перевода." . $res;
+        	header("Location: ../acc.php#transaction_acc");
+		return;
+	}	
 	$_SESSION["message-transaction_acc"] = "Успешный перевод.";
         header("Location: ../acc.php#transaction_acc");
 		
