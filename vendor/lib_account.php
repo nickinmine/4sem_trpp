@@ -69,7 +69,9 @@
 	
 		$stmt = $mysqli->prepare("SELECT count(*) FROM account WHERE idclient = ? AND closed = '0000-00-00' AND currency = ?");
 		$stmt->bind_param("is", $idclient, $currency);
-		$stmt->execute();
+		if (!$stmt->execute()) {
+			return $mysqli->error;
+		}
 		$cntaccount = $stmt->get_result()->fetch_row()[0];
 
 		$default = 1; // счет по умолчанию для приема переводов

@@ -26,7 +26,9 @@
 		$stmt->bind_param("ssd", $acc[0], $current_date, $acc_balance);
 		$stmt->execute();
 	}
-
+	// пересчет процентов по вкладам
+	
+	// обновление даты
 	$mysqli->query("UPDATE operdays SET current = 0 WHERE current = 1");
 	$stmt = $mysqli->prepare("INSERT INTO operdays (operdate, current) VALUES (?, 1)");
 	$stmt->bind_param("s", $new_date);

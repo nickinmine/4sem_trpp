@@ -63,6 +63,8 @@ INSERT INTO `account` (`idclient`,`accountnum`,`currency`,`descript`,`closed`,`t
  (9,'40800810100010000016','810','Счет физ. лица','2022-03-22','active',0),
  (2,'40800810100010000017','810','Счет физ. лица','0000-00-00','active',0),
  (15,'40800810100010000022','810','Счет физ. лица','0000-00-00','active',0),
+ (15,'40800810100010000023','810','Счет физ. лица','0000-00-00','active',0),
+ (15,'40800810100010000024','810','Счет физ. лица','0000-00-00','active',0),
  (9,'40800840100010000002','840','Счет физ. лица','2022-03-22','active',0),
  (9,'40800840100010000003','840','Счет физ. лица','2022-03-22','active',0),
  (9,'40800840100010000004','840','Счет физ. лица','2022-03-22','active',0),
@@ -97,10 +99,11 @@ CREATE TABLE `accountcnt` (
 
 /*!40000 ALTER TABLE `accountcnt` DISABLE KEYS */;
 INSERT INTO `accountcnt` (`acc2p`,`currency`,`cnt`) VALUES 
- ('40800','810',22),
+ ('40800','810',24),
  ('40800','840',6),
  ('40800','978',6),
- ('47411','810',2),
+ ('42301','810',1),
+ ('47411','810',3),
  ('47423','810',2);
 /*!40000 ALTER TABLE `accountcnt` ENABLE KEYS */;
 
@@ -318,9 +321,9 @@ CREATE TABLE `deposits` (
   `type` varchar(45) NOT NULL,
   `opendate` date NOT NULL,
   `closedate` date DEFAULT NULL,
-  `sum` decimal(15,2) NOT NULL,
   `mainacc` varchar(20) NOT NULL COMMENT 'Счет для суммы',
   `percacc` varchar(20) NOT NULL COMMENT 'Счет для процентов',
+  `update` date NOT NULL COMMENT 'Дата последнего пересчета вклада',
   PRIMARY KEY (`id`),
   KEY `FK_deposits_2` (`type`),
   KEY `FK_deposits_3` (`mainacc`),
@@ -408,7 +411,7 @@ CREATE TABLE `operations` (
   KEY `FK_operations_cr` (`cr`),
   CONSTRAINT `FK_operations_cr` FOREIGN KEY (`cr`) REFERENCES `account` (`accountnum`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `FK_operations_db` FOREIGN KEY (`db`) REFERENCES `account` (`accountnum`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Таблица операций';
+) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='Таблица операций';
 
 --
 -- Dumping data for table `operations`
@@ -513,7 +516,8 @@ INSERT INTO `operations` (`idoper`,`db`,`cr`,`operdate`,`sum`,`employee`) VALUES
  (122,'40800840100010000006','30303840600010000001','2022-03-25 21:29:41','111.00','admin'),
  (123,'30303978600010000001','40800978100010000005','2022-03-25 21:29:41','93.30','admin'),
  (124,'30303810600010000001','70601810500000000001','2022-03-25 21:29:41','38.85','admin'),
- (125,'20202810100000000001','40800810100010000022','2022-03-25 16:59:59','0.50','admin');
+ (125,'20202810100000000001','40800810100010000022','2022-03-25 16:59:59','0.50','admin'),
+ (131,'20202810100000000001','40800810100010000023','2022-03-25 12:01:15','100000.00','admin');
 /*!40000 ALTER TABLE `operations` ENABLE KEYS */;
 
 

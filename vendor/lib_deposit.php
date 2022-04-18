@@ -21,17 +21,30 @@
 		$idclient = $data[0];
 		$currency = $data[1];
 		$mainacc = "";
-		create_account($idclient, $currency, "42301", "Основной счет вклада", $mainacc);                                
+		$res = create_account($idclient, $currency, "42301", "Основной счет вклада", $mainacc);
+		if ($res != "") {
+			return $res;
+		}                                
 		$percacc = "";
-		create_account($idclient, $currency, "47411", "Дополнительный счет вклада", $percacc);
+		$res = create_account($idclient, $currency, "47411", "Дополнительный счет вклада", $percacc);
+		if ($res != "") {
+			return $res;
+		}
 		$res = transaction($debit_accountnum, $mainacc, $sum, $user);
-		/// !!!
-		$stmt = $mysqli->prepare("INSERT INTO deposits (idclient, type, opendate, closedate, sum, mainacc, percacc) " . 
-			"VALUES (?, ?, (SELECT operdate FROM operdays WHERE current = 1), '0000-00-00', ?, ?, ?)");
-		$stmt->bind_param("issss", $idclient, $type, $sum, $mainacc, $percacc);
+		if ($res != "") {
+			return $res;
+		}
+		addlog($idclient . " " . $type . " " . $mainacc . " " . $percacc);
+		$stmt = $mysqli->prepare("INSERT INTO deposits (idclient, `type`, opendate, closedate, mainacc, percacc, `update`) VALUES (?, ?, " . 
+			"(SELECT operdate FROM operdays WHERE current = 1), '0000-00-00', ?, ?, (SELECT operdate FROM operdays WHERE current = 1))");
+		$stmt->bind_param("isss", $idclient, $type, $mainacc, $percacc);
 		if (!$stmt->execute())
 			return $mysqli->error;
 		return "";
+	}
+
+	function update_deposit($id, ) {
+		
 	}
 	
 ?>

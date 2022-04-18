@@ -38,5 +38,4 @@
 	$_SESSION["message-create_deposit"] = "Вклад открыт.";
 	header("Location: ../operwork.php#create_deposit");
 		
-	
 ?>

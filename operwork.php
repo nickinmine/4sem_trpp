@@ -133,9 +133,9 @@
 					<div class="form-content">
 						<p>Выберите счет</p>
 						<label><div class="select-block"><select name="accountnum" required>
-									<option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-								</select></div></label>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"], "", true); ?>
+						</select></div></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный счёт">
@@ -152,9 +152,9 @@
 					<div class="form-content">
 						<p>Выберите счет</p>
 						<label><div class="select-block"><select name="credit_accountnum" required>
-									<option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-								</select></div></label>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
 					</div>
 					<div>
 						<label>Сумма пополнения<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
@@ -173,9 +173,9 @@
 					<div class="form-content">
 						<p>Выберите счет</p>
 						<label><div class="select-block"><select name="debit_accountnum" required>
-									<option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-								</select></div></label>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
 					</div>
 					<div>
 						<label>Сумма снятия<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
@@ -193,15 +193,15 @@
 				<form action="vendor/transaction_in.php" method="POST">
 					<div class="form-content"><p>Счет отправки перевода</p>
 						<label><div class="select-block"><select name="debit_accountnum" required>
-									<option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-								</select></div></label>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
 					</div>
 					<div class="form-content"><p>Счет приема перевода</p>
 						<label><div class="select-block"><select name="credit_accountnum" required>
-									<option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-								</select></div></label>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
 					</div>
 					<div>
 						<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
@@ -219,9 +219,9 @@
 				<form action="vendor/transaction_out.php" method="POST">
 					<div class="form-content"><p>Счет отправки перевода</p>
 						<label><div class="select-block"><select name="debit_accountnum" required>
-									<option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-								</select></div></label>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
 					</div>
 					<div>
 						<label>Перевод клиенту с номером телефона:<input type="tel" name="credit_phone" required placeholder="Номер телефона"></label>
@@ -244,15 +244,15 @@
                 <form action="vendor/create_deposit.php" method="POST">
                     <div class="form-content"><p>Вид вклада</p>
                         <label><div class="select-block"><select name="type" required>
-                                    <option selected></option>
-									<?php echo out_deposit_box(); ?>
-                                </select></div></label>
+				<option selected></option>
+				<?php echo out_deposit_box(); ?>
+			</select></div></label>
                     </div>
                     <div class="form-content"><p>Средства для вклада будут взяты со счета</p>
                         <label><div class="select-block"><select name="debit_accountnum" required>
-                                    <option selected></option>
-									<?php echo out_account_box($_SESSION["client"]["id"]); ?>
-                                </select></div></label>
+				<option selected></option>
+				<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+			</select></div></label>
                     </div>
                     <div>
                         <label>Сумма вклада<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
