@@ -49,9 +49,9 @@
 			<div class="form">
 				<div class="form-name"><p>Поиск клиента</p></div>
 				<form action="vendor/find_client_by_passport.php" method="POST">
-					<?php update_deposit(3, "2023-03-25", $_SESSION["user"]["login"]);
+					<?php //update_deposit(3, "2023-03-25", $_SESSION["user"]["login"]);
 					//echo check_balance("42301810100010000003");
-					echo check_balance("42301810100010000002");
+					//echo check_balance("42301810100010000002");
 					/*$opendate = "2022-01-31";
 					$capdate = []; // даты капитализации
 					for ($i = 1; $i <= 12; $i++) {
