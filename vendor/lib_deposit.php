@@ -21,25 +21,28 @@
 		$idclient = $data[0];
 		$currency = $data[1];
 		$mainacc = "";
+		//addlog($idclient);
 		$res = create_account($idclient, $currency, "42301", "Основной счет вклада", $mainacc);
 		if ($res != "") {
 			return $res;
 		}                                
 		$percacc = "";
 		$res = create_account($idclient, $currency, "47411", "Дополнительный счет вклада", $percacc);
-		if ($res != "") {
+		if ($res != "") {    
 			return $res;
 		}
 		$res = transaction($debit_accountnum, $mainacc, $sum, $user);
-		if ($res != "") {
+		if ($res != "") {    
 			return $res;
 		}
-		addlog($idclient . " " . $type . " " . $mainacc . " " . $percacc);
-		$stmt = $mysqli->prepare("INSERT INTO deposits (idclient, `type`, opendate, closedate, mainacc, percacc, `update`) VALUES (?, ?, " . 
-			"(SELECT operdate FROM operdays WHERE current = 1), '0000-00-00', ?, ?, (SELECT operdate FROM operdays WHERE current = 1))");
+		//addlog($idclient . " " . $type . " " . $mainacc . " " . $percacc);
+		$stmt = $mysqli->prepare("INSERT INTO deposits (idclient, `type`, opendate, closedate, mainacc, percacc, `update`, capdate) VALUES (?, ?, " . 
+			"(SELECT operdate FROM operdays WHERE current = 1), '0000-00-00', ?, ?, (SELECT operdate FROM operdays WHERE current = 1), " . 
+			"(SELECT operdate FROM operdays WHERE current = 1))");
 		$stmt->bind_param("isss", $idclient, $type, $mainacc, $percacc);
-		if (!$stmt->execute())
+		if (!$stmt->execute()) {       
 			return $mysqli->error;
+		}
 		return "";
 	}
 
@@ -76,22 +79,18 @@
 			return $mysqli->error;
 		}
 		$rate = $stmt->get_result()->fetch_row()[0];
-		//addlog("opendate = " . $opendate);
-		//addlog("update = " . $update);
 		$capdate = []; // даты капитализации
 		if ($modify == "") {
 			$capdate[1] = add_months($opendate, $monthcnt);
 		}
 		if ($modify == "+1 month") {
 			for ($i = 1; $i <= $monthcnt; $i++) {
-				$capdate[$i] = add_months($opendate, $i);
-				//addlog("capdate = " . $capdate[$i]);
+				$capdate[$i] = add_months($opendate, $i);    
 			}
 		}
 		if ($modify == "+3 month") {
 			for ($i = 1; $i <= $monthcnt; $i += 3) {
 				$capdate[$i] = add_months($opendate, $i);
-				//addlog("capdate = " . $capdate[$i]);
 			}
 		}		
 		$i = 1;
@@ -99,10 +98,7 @@
 			$i++;
 		addlog("next capdate = " . $capdate[$i]);
 		while ($capdate[$i] <= $newdate && $i <= count($capdate)) {
-			//addlog("diff_date at " . $update . " to " . $capdate[$i]);
-			//addlog("diff_date = " . diff_date($update, $capdate[$i]));
 			$sum = standart_sum(diff_date($update, $capdate[$i]) * $rate / 100 / 365 * check_balance($mainacc));
-			//addlog("sum to " . $capdate[$i] . " = " . $sum);
 			$res = transaction("70601810500000000001", $percacc, $sum, $user);
 			if ($res != "") {
 				return $mysqli->error;
@@ -113,7 +109,6 @@
 				return $mysqli->error;
 			}
 			$update = $capdate[$i];
-			//addlog("update = " . $update);
 			$i++;                
 		}
 		if ($i <= count($capdate)) {
@@ -125,23 +120,27 @@
 				}
 			}
 		}
-		/*else { // до востребования
-			$rate = $mysqli->query("SELECT rate FROM depositeterms WHERE `type` = 'dv'")->fetch_row()[0];	
-			$sum = standart_sum(diff_date($update, $newdate) * $rate / 100 / 365 * check_balance($mainacc));
-			if ($sum != 0.00) {
-				$res = transaction("70601810500000000001", $percacc, $sum, $user);
-				if ($res != "") {
-					return $mysqli->error;
-				}
-			}
-		}*/
-		
-		$stmt = $mysqli->prepare("UPDATE deposits SET `update` = ? WHERE id = ?");
-		$stmt->bind_param("si", $newdate, $id);
+		$stmt = $mysqli->prepare("UPDATE deposits SET `update` = ?, capdate = ? WHERE id = ?");
+		$stmt->bind_param("ssi", $newdate, $id, $capdate);
 		if (!$stmt->execute()) {
 			return $mysqli->error;
 		}
 		return "";                            			
+	}
+	
+	function out_client_deposit_box($idclient) {
+		$mysqli = get_sql_connection();
+		$stmt = $mysqli->prepare("SELECT d.id, d.mainacc, t.descript, DATE_ADD(d.opendate , interval t.monthcnt MONTH) enddate " . 
+			"FROM deposits d LEFT JOIN depositeterms t ON t.`type` = d.`type` WHERE d.idclient = ? AND d.closedate = '0000-00-00'");
+		$stmt->bind_param("i", $idclient);
+		$stmt->execute();
+		$str = "";
+		$result = $stmt->get_result();
+		foreach ($result as $res) {
+			$str .= "<option value = \"" . $res["id"] . "\">" . $res["descript"] . ", сумма " . standart_sum(check_balance($res["mainacc"])) .
+				", окончание " . out_date($res["enddate"]) . "</option>\n";
+		}
+		return $str;
 	}
 	
 ?>

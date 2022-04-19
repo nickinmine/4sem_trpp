@@ -13,6 +13,19 @@
 	}
 	$mysqli->query("BEGIN");
 
+	// пересчет процентов по вкладам
+	$deposits = $mysqli->query("SELECT id FROM deposits WHERE closedate = '0000-00-00'");
+	foreach ($deposits as $result) {
+		$id = $result["id"];
+		//addlog("Расчет вклада " . $id);
+		$res = update_deposit($id, $new_date, $_SESSION["user"]["login"]);
+		//addlog("Результат " . $res);
+		if ($res != "") {
+			$_SESSION['message-operdate'] = "Ошибка при пересчете вкладов.\n" . $res;
+			header('Location: ../acc.php#change_operdate');
+		}
+	}
+
 	// пересчет остатков на счетах, процентов по вкладам, погашению кредитов...
 	$stmt = $mysqli->prepare("SELECT DISTINCT db FROM operations WHERE operdate >= ? UNION " . 
 		"SELECT DISTINCT cr FROM operations WHERE operdate >= ?");
@@ -26,15 +39,7 @@
 		$stmt->bind_param("ssd", $acc[0], $current_date, $acc_balance);
 		$stmt->execute();
 	}
-	// пересчет процентов по вкладам
-	$deposits = $mysqli->query("SELECT id FROM deposits WHERE closed = '0000-00-00'");
-	foreach ($deposits as $id) {
-		$res = update_deposit($id, $new_date, $_SESSION["user"]["login"]);
-		if ($res != "") {
-			$_SESSION['message-operdate'] = "Ошибка при пересчете вкладов.\n" . $res;
-			header('Location: ../acc.php#change_operdate');
-		}
-	}
+	
 	// обновление даты
 	$mysqli->query("UPDATE operdays SET current = 0 WHERE current = 1");
 	$stmt = $mysqli->prepare("INSERT INTO operdays (operdate, current) VALUES (?, 1)");

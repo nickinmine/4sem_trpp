@@ -198,24 +198,20 @@
 		}
  
 		// Это последний день месяца?
-		if ($d == date('t',$time)) {
+		if ($d == date('t', $time)) {
 			$d=31;
 		}
 		// Открутить дату до последнего дня месяца
-		if (!checkdate($m, $d, $y)){
-			$d=date('t', mktime(0, 0, 0, $m, 1, $y));
+		if (!checkdate($m, $d, $y)) {
+			$d = date('t', mktime(0, 0, 0, $m, 1, $y));
 		}
 		// Вернуть новую дату
 		return sprintf("%04d-%02d-%02d", $y, $m, $d);
 	}
 	
-	function modify_date($date, $oper) {
-		if ($oper == "") {
-			return "9999-12-31";
-		}
-		$datetime = new DateTime($date);
-		$datetime->modify($oper);
-		return $datetime->format('Y-m-d');     
+	function out_date($date) {
+		$datetime = new DateTime($date);    
+		return $datetime->format('d.m.Y');     
 	}
 	
 	function diff_date($date1, $date2) {

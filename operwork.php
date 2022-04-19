@@ -263,6 +263,28 @@
 					<label class="report"><?php echo session_message("message-create_deposit"); ?></label>
 				</form>
 			</div>
+			<div class="form">
+				<a class="anchor" id="create_deposit"></a>
+				<div class="form-name"><p>Закрытие вклада</p></div>
+				<form action="vendor/close_deposit.php" method="POST">
+					<div class="form-content"><p>Выберите вклад</p>
+						<label><div class="select-block"><select name="type" required>
+							<option selected></option>
+							<?php echo out_client_deposit_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
+					</div>
+					<div class="form-content"><p>Средства будут перечислены на счет</p>
+						<label><div class="select-block"><select name="accountnum" required>
+							<option selected></option>
+							<?php echo out_account_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
+					</div>
+                    			<div>
+						<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный вклад">
+					</div>
+					<label class="report"><?php echo session_message("message-close_deposit"); ?></label>
+				</form>
+			</div>
 		</div>
 		<div class="air"></div>
 	</div>
