@@ -186,14 +186,41 @@
 		return;
 	}
 
+	function add_months($date, $cntm) {
+		$d = substr($date, 8, 2);  // день
+		$m = substr($date, 5, 2);  // месяц
+		$y = substr($date, 0, 4);  // год
+ 
+		// Прибавить месяцы
+		for ($i = 0; $i < $cntm; $i++) {
+			$m++;
+			if ($m > 12) { $y++; $m=1; }
+		}
+ 
+		// Это последний день месяца?
+		if ($d == date('t',$time)) {
+			$d=31;
+		}
+		// Открутить дату до последнего дня месяца
+		if (!checkdate($m, $d, $y)){
+			$d=date('t', mktime(0, 0, 0, $m, 1, $y));
+		}
+		// Вернуть новую дату
+		return sprintf("%04d-%02d-%02d", $y, $m, $d);
+	}
+	
 	function modify_date($date, $oper) {
-		if ($oper == NULL) {
-			return "6000-01-01";
+		if ($oper == "") {
+			return "9999-12-31";
 		}
 		$datetime = new DateTime($date);
 		$datetime->modify($oper);
-		return $datetime->format('Y-m-d');      
+		return $datetime->format('Y-m-d');     
 	}
 	
-	
+	function diff_date($date1, $date2) {
+		$date1 = strtotime($date1);
+		$date2 = strtotime($date2);
+		return ($date2 - $date1) / 60 / 60 / 24;
+	}
 ?>

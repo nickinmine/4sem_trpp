@@ -27,7 +27,7 @@
 		$stmt->execute();
 	}
 	// пересчет процентов по вкладам
-	$deposits = $mysqli->query("SELECT id FROM deposits");
+	$deposits = $mysqli->query("SELECT id FROM deposits WHERE closed = '0000-00-00'");
 	foreach ($deposits as $id) {
 		$res = update_deposit($id, $new_date, $_SESSION["user"]["login"]);
 		if ($res != "") {
