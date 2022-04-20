@@ -58,7 +58,7 @@
 				<label>Дата нового открытого дня</label>
 				<label><input type="date" name="date"></label>
              			<input class="button" type="submit" value="Установить" title="Установить указанный день как текущий">
-			<label class="message"><?php echo session_message("message-operdate"); ?></label>
+			<label class="report"><?php echo session_message("message-operdate"); ?></label>
 		</form>
 	</div>
 	<div class="form">

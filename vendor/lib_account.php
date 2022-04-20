@@ -91,7 +91,7 @@
 	}
 
 	function close_account($accountnum) {
-		if (check_balance($accountnum) != 0) 
+		if (check_balance($accountnum) != 0.00) 
 			return "Закрыть можно только пустой счет.";       
 			
 		$mysqli = get_sql_connection();

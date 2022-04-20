@@ -9,6 +9,8 @@
 		return;
 	}
 	
+	$mysqli = get_sql_connection();
+		
 	$mysqli->query("BEGIN");
         $res = close_account($_POST["accountnum"]);
 	

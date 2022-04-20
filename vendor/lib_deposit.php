@@ -96,7 +96,7 @@
 		$i = 1;
 		while ($capdate[$i] <= $update && $i <= count($capdate))
 			$i++;
-		addlog("next capdate = " . $capdate[$i]);
+		//addlog("next capdate = " . $capdate[$i]);
 		while ($capdate[$i] <= $newdate && $i <= count($capdate)) {
 			$sum = standart_sum(diff_date($update, $capdate[$i]) * $rate / 100 / 365 * check_balance($mainacc));
 			$res = transaction("70601810500000000001", $percacc, $sum, $user);
@@ -121,7 +121,7 @@
 			}
 		}
 		$stmt = $mysqli->prepare("UPDATE deposits SET `update` = ?, capdate = ? WHERE id = ?");
-		$stmt->bind_param("ssi", $newdate, $id, $capdate);
+		$stmt->bind_param("ssi", $newdate, $capdate[$i], $id);
 		if (!$stmt->execute()) {
 			return $mysqli->error;
 		}

@@ -264,11 +264,11 @@
 				</form>
 			</div>
 			<div class="form">
-				<a class="anchor" id="create_deposit"></a>
+				<a class="anchor" id="close_deposit"></a>
 				<div class="form-name"><p>Закрытие вклада</p></div>
 				<form action="vendor/close_deposit.php" method="POST">
 					<div class="form-content"><p>Выберите вклад</p>
-						<label><div class="select-block"><select name="type" required>
+						<label><div class="select-block"><select name="id" required>
 							<option selected></option>
 							<?php echo out_client_deposit_box($_SESSION["client"]["id"]); ?>
 						</select></div></label>
