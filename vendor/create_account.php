@@ -5,7 +5,7 @@
 
 	$idclient = (int)$_SESSION["client"]["id"];
 	$currency = $_POST["currency"];
-	$acc2p = "40800";
+	$acc2p = "40817";
 	$descript = "Счет физ. лица";
 	
 	$res = create_account($idclient, $currency, $acc2p, $descript);

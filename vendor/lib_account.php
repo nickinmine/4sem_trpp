@@ -1,15 +1,16 @@
 <?php
 	require_once "lib.php";
 
-	function generate_accountnum($acc2p, $currency) {             
-		$mysqli = get_sql_connection();
+	function generate_accountnum($acc2p, $currency, $pmysqli = NULL) {
+		$mysqli = $pmysqli ?? get_sql_connection();
 
 		$stmt = $mysqli->prepare("SELECT cnt FROM accountcnt WHERE acc2p = ? AND currency = ?");
 		$stmt->bind_param("ss", $acc2p, $currency);
 		$stmt->execute();
-		$cnt = $stmt->get_result()->fetch_row()[0];		
+		$row = $stmt->get_result()->fetch_row();
+		$cnt = $row ? $row[0] : 0;		
 
-		echo $cnt;
+		//addlog("generate_accountnum( acc2p = " . $acc2p . ", currency = " . $currency . "): cnt = " . $cnt);
 
 		// Структура банковского счета:
 		// 408 - счет физ.лица
@@ -34,8 +35,17 @@
 		return $accountnum;
 	}
 
-	function check_balance($accountnum) { // баланс считается на конец дня
-		$mysqli = get_sql_connection();
+	function sign_acctype($acctype) {
+		$sign = 0;
+		if ($acctype == "active")
+			$sign = 1;
+		elseif ($acctype == "passive")
+			$sign = -1;
+		return $sign;
+	}
+
+	function check_balance2($accountnum, &$acccurr, &$acctype, $pmysqli = NULL) { // аналог check_balance(), возвращает дополнительно тип счета (А/П)
+		$mysqli = $pmysqli ?? get_sql_connection();
 		$stmt = $mysqli->prepare("SELECT `sum`, dt FROM balance WHERE account = ? ORDER BY dt DESC LIMIT 1");
 		$stmt->bind_param("s", $accountnum);
 		$stmt->execute();
@@ -43,13 +53,24 @@
 		$sum = 0;
 		$dt = "0000-00-00";
 
-		$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
+		//addlog($accountnum . " : sum = " . $res[0] . "; dt = " . $res[1]);
+
+		$stmt = $mysqli->prepare(
+			"SELECT a.currency, t.`type` " .
+			"FROM account a " .
+			"  LEFT JOIN accounttype t on t.acc2p = substr(a.accountnum, 1, 5) " .
+			"WHERE accountnum = ?");
 		$stmt->bind_param("s", $accountnum);
 		$stmt->execute();
-		$sign = ($stmt->get_result()->fetch_row()[0] == "active" ? 1 : -1);	
+		$row = $stmt->get_result()->fetch_row();
+		$acccurr = $row[0];
+		$acctype = $row[1];
+		$sign = sign_acctype($acctype);	
+
+		//addlog("acctype = " . $acctype . "; sign = " . $sign);
 
 		if ($res) {
-			$sum = $res[0];
+			$sum = $res[0] * $sign;
 			$dt = $res[1];	
 		}
 
@@ -57,15 +78,36 @@
 			" + IFNULL((SELECT SUM(`sum`) FROM operations WHERE operdate > concat(?, ' 23:59:59') AND cr = ?), 0)");
 		$stmt->bind_param("ssss", $dt, $accountnum, $dt, $accountnum);
 		$stmt->execute();                          
-		$sum += $sign * $stmt->get_result()->fetch_row()[0];	
+		$sum += $sign * $stmt->get_result()->fetch_row()[0];
 
-		return $sum;   
+		//addlog("sum(total) = " . $sum);
+
+		return round_sum($sum);
 	}
 
-	function create_account($idclient, $currency, $acc2p, $descript, &$res_account = NULL) {
-		$accountnum = generate_accountnum($acc2p, $currency);
-		
-		$mysqli = get_sql_connection();
+
+	function check_balance($accountnum, $pmysqli = NULL) { // баланс считается на конец дня
+		$acctype = "";
+		$acccurr = "";
+		return check_balance2($accountnum, $acccurr, $acctype, $pmysqli);
+	}
+
+	function get_account_currency($accountnum, $pmysqli = NULL) { // получить валюту счета
+		$mysqli = $pmysqli ?? get_sql_connection();
+		$stmt = $mysqli->prepare("SELECT currency FROM account WHERE accountnum = ?");
+		$stmt->bind_param("s", $accountnum);
+		if (!$stmt->execute())
+			return NULL;
+		$row = $stmt->get_result()->fetch_row();
+		if (!$row)
+			return NULL;
+		return $row[0];
+	}
+
+	function create_account($idclient, $currency, $acc2p, $descript, &$res_account = NULL, $pmysqli = NULL) {
+		$mysqli = $pmysqli ?? get_sql_connection();
+
+		$accountnum = generate_accountnum($acc2p, $currency, $mysqli);
 	
 		$stmt = $mysqli->prepare("SELECT count(*) FROM account WHERE idclient = ? AND closed = '0000-00-00' AND currency = ?");
 		$stmt->bind_param("is", $idclient, $currency);
@@ -79,22 +121,19 @@
 			$default = 0;
 
 		$stmt = $mysqli->prepare("INSERT INTO account (idclient, accountnum, currency, descript, `default`) VALUES (?, ?, ?, ?, ?)");
-	        
         	$stmt->bind_param("isssi", $idclient, $accountnum, $currency, $descript, $default);
-		
-		if (!$stmt->execute()) {
+		if (!$stmt->execute())
 			return $mysqli->error;
-		}
 
 		$res_account = $accountnum;
 		return "";
 	}
 
-	function close_account($accountnum) {
-		if (check_balance($accountnum) != 0.00) 
+	function close_account($accountnum, $pmysqli = NULL) {
+		$mysqli = $pmysqli ?? get_sql_connection();
+		if (check_balance($accountnum, $mysqli) != 0.00) 
 			return "Закрыть можно только пустой счет.";       
 			
-		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare("SELECT currency, `default`, idclient FROM account WHERE accountnum = ?");
 		$stmt->bind_param("s", $accountnum);
 		if (!$stmt->execute()) {
@@ -132,6 +171,23 @@
 		if (!$stmt->execute()) {
 			return $mysqli->error;
 		}
+		return "";
+	}
+
+	function find_bank_account($accountnum, $mask, &$corraccountnum, $pmysqli = NULL) {
+		$mysqli = $pmysqli ?? get_sql_connection();
+		$stmt = $mysqli->prepare(
+			"SELECT accountnum " .
+			"FROM account " .
+			"WHERE idclient = 1 AND accountnum LIKE ? AND closed = '0000-00-00' " .
+			"  AND currency = (SELECT currency FROM account WHERE accountnum = ?)");
+		$stmt->bind_param("ss", $mask, $accountnum);
+		if (!$stmt->execute())
+			return "Не найден счет '$mask' для $accountnum: запрос не выполнен.";
+		$row = $stmt->get_result()->fetch_row();
+		if (!$row)
+			return "Не найден счет '$mask' для $accountnum.";
+		$corraccountnum = $row[0];
 		return "";
 	}
 ?>

@@ -1,27 +1,29 @@
 <?php   
 	require_once "lib_account.php";
 	require_once "lib_deposit.php";
+	require_once "lib_credit.php";
 	
 	function safe_session_start() {
 		if(!isset($_SESSION))
 			session_start(); 
 	}
 
-	function get_sql_connection() {
-		safe_session_start();
-		//if (!array_key_exists("connection", $_SESSION)) {
-			$_SESSION["connection"] = new mysqli("localhost", "root", "", "bankbase");
-		//}
-		return $_SESSION["connection"];
-	}
-
 	function addlog($str) {
-		$logfile = "..\\!log.txt";
+		$tempdir = 'c:\temp'; // если есть такой каталог
+		if (!file_exists($tempdir)) // иначе
+			$tempdir = sys_get_temp_dir(); // системный - c:\windows\temp
+		$logfile = $tempdir .'\!log.txt';
 		$fd = fopen($logfile, 'a+');
 		if ($fd) {
+			date_default_timezone_set("Europe/Moscow");
 			fwrite($fd, date("Y-m-d H:i:s") . " " . $str . "\r\n");
 			fclose($fd);
 		}
+	}
+
+	function get_sql_connection() {
+		$mysqli = new mysqli("p:localhost", "root", "", "bankbase"); // исп. постоянные соединения
+		return $mysqli;
 	}
 
 	function session_message($key) {
@@ -36,10 +38,20 @@
 
 	function out_account_box($idclient, $descript = "", $out_null = false) {
 		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare("SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency " . 
-			"WHERE closed = '0000-00-00' AND idclient = ? AND accountnum LIKE '40800%'");
+		$stmt = $mysqli->prepare(
+			"SELECT a.accountnum, c.isocode, a.descript, " .
+			"  CASE WHEN t.`type` = 'active' THEN 'А' WHEN t.`type` = 'passive' THEN 'П' ELSE '?' END typemark " .
+			"FROM account a " .
+			"  LEFT JOIN currency c ON c.code = a.currency " . 
+			"  LEFT JOIN accounttype t ON t.acc2p = SUBSTR(a.accountnum, 1, 5) " .
+			"WHERE closed = '0000-00-00' AND idclient = ? AND accountnum LIKE '40817%'");
 		if ($descript == "out_acc") {
-			$stmt = $mysqli->prepare("SELECT accountnum, isocode, descript FROM account a LEFT JOIN currency c ON c.code = a.currency " . 
+			$stmt = $mysqli->prepare(
+				"SELECT accountnum, isocode, descript, " .
+				"  CASE WHEN t.`type` = 'active' THEN 'А' WHEN t.`type` = 'passive' THEN 'П' ELSE '?' END typemark " .
+				"FROM account a " .
+				"  LEFT JOIN currency c ON c.code = a.currency " . 
+				"  LEFT JOIN accounttype t ON t.acc2p = SUBSTR(a.accountnum, 1, 5) " .
 				"WHERE closed = '0000-00-00' AND idclient = ?");
 		}
 			
@@ -49,14 +61,14 @@
 		$str = "";
 
 		foreach ($result as $res) {
-			$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
+			/*$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
 			$stmt->bind_param("s", $res["accountnum"]);
 			$stmt->execute();
-			$sign = ($stmt->get_result()->fetch_row()[0]) == "active" ? 1 : -1;
-			$balance = $sign * check_balance($res["accountnum"]);
+			$sign = ($stmt->get_result()->fetch_row()[0]) == "active" ? 1 : -1;*/
+			$balance = /*$sign * */check_balance($res["accountnum"]);
 			if (!$out_null || ($out_null && $balance == 0))
 				$str .= '<option value = "' . $res["accountnum"] . '">Счет №' . $res["accountnum"] . ': ' 
-					. sprintf("%.2f", $balance) . ' ' . $res["isocode"] . ', ' . $res["descript"] . '</option>';	                                       	
+					. sprintf("%.2f", $balance) . ' ' . $res["isocode"] . ', ' . $res["descript"] . ' (' . $res["typemark"] . ')' . '</option>';	                                       	
 		}
 		return $str;
 	}
@@ -88,6 +100,10 @@
 		return sprintf("%.2f", $sum2);
 	}
 
+	function round_sum($sum) {
+		return round($sum, 2);
+	}
+
 	function out_value($data) {
 		safe_session_start();
 		$id = $_SESSION["client"]["id"];
@@ -99,7 +115,7 @@
 		return 'value="' . $result . '"';
 	}
 
-	function convert_sum($sum, $in_currency, $out_currency) {
+	/*function convert_sum($sum, $in_currency, $out_currency) {
 		$mysqli = get_sql_connection();
 
 		$stmt = $mysqli->prepare("SELECT buy FROM converter WHERE current = 1 AND currency = ?");
@@ -114,76 +130,114 @@
 		$buy_sum = $stmt->get_result()->fetch_row()[0];
 		$out_sum = $in_sum / $buy_sum;
 		
-		return standart_sum($out_sum);
-	}
+		return round_sum($out_sum);
+	}*/
 
-	function transaction($debit_accountnum, $credit_accountnum, $sum, $user) {
-		if (check_balance($debit_accountnum) < $sum) 
-			return "Недостаточно средств на счете";
-		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
-			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
-		$stmt->bind_param("ssss", $debit_accountnum, $credit_accountnum, $sum, $user);
-		if (!$stmt->execute())
-			return $mysqli->error;
+	function transaction($debit_accountnum, $credit_accountnum, $psum, $user, $pmysqli = NULL) { // перевод между счетами в одной валютой
+		$mysqli = $pmysqli ?? get_sql_connection();
+		$sum = round_sum($psum);		
+
+		$dbacctype = "";
+		$dbacccurr = "";
+		$dbbal = check_balance2($debit_accountnum, $dbacccurr, $dbacctype, $mysqli);
+		$cracctype = "";
+		$cracccurr = "";
+		$crbal = check_balance2($credit_accountnum, $cracccurr, $cracctype, $mysqli);
+
+		//addlog("@@@");
+		//addlog("dbacctype = $dbacctype; dbbal = $dbbal");
+		//addlog("cracctype = $cracctype; crbal = $crbal");
+		//addlog("sum = $sum");
+		if ($debit_accountnum == $credit_accountnum)
+			return "Выберите разные счета!";
+		if ($dbacccurr != $cracccurr)
+			return "Валюты счетов не совпадают: " . $dbacccurr . " <> " . $cracccurr;
+		if (sign_acctype($dbacctype) > 0 && $dbbal < $sum) // дебет активный, остаток маловат
+			return "Недостаточно средств на счете " . $debit_accountnum;
+		if (sign_acctype($cracctype) < 0 && $crbal < $sum) // кредит пассивный, остаток маловат
+			return "Недостаточно средств на счете " . $credit_accountnum;
+		if ($sum < 0.00)
+			return "Сумма проводки должна быть больше нуля ($debit_accountnum, $credit_accountnum): " . sprintf("%.2f", $sum);
+
+		if ($sum > 0.00) { // проводку с суммой 0.00 просто не сохраняем в БД, ошибку не генерируем
+			$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, " .
+				"(SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
+			$stmt->bind_param("ssds", $debit_accountnum, $credit_accountnum, $sum, $user);
+			if (!$stmt->execute())
+				return $mysqli->error;
+		}
 		return "";
 	}
 	
-	function conversion($debit_accountnum, $credit_accountnum, $sum, $user) {
-		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare("SELECT currency FROM account WHERE accountnum = ?");
-		$stmt->bind_param("s", $debit_accountnum);
-		$stmt->execute();
-		$debit_currency = $stmt->get_result()->fetch_row()[0];
-	        $stmt->bind_param("s", $credit_accountnum);
-		$stmt->execute();
-		$credit_currency = $stmt->get_result()->fetch_row()[0];
+	function conversion($src_accountnum, $dst_accountnum, $sum, $user, $pmysqli = NULL) { // перевод между счетами с разной валютой
+		$mysqli = $pmysqli ?? get_sql_connection();
 
-		$stmt->prepare("SELECT accountnum FROM account WHERE accountnum LIKE '30303%' AND currency = ?");
-		$stmt->bind_param("s", $debit_currency);
-		$stmt->execute();
-		$convert_debit_accountnum = $stmt->get_result()->fetch_row()[0];
-		$stmt->bind_param("s", $credit_currency);
-		$stmt->execute();
-		$convert_credit_accountnum = $stmt->get_result()->fetch_row()[0];
-		$rub_currency = "810";
-		$stmt->bind_param("s", $rub_currency);
-		$stmt->execute();
-		$convert_rub_accountnum = $stmt->get_result()->fetch_row()[0]; 
+		$src_currency = get_account_currency($src_accountnum, $mysqli);
+		$src_corr_accountnum = "";
+		$res = find_bank_account($src_accountnum, "70601".$src_currency."%0001", $src_corr_accountnum, $mysqli);
+		if ($res != "")
+			return res;
+		$dst_currency = get_account_currency($dst_accountnum, $mysqli);
+		$dst_corr_accountnum = "";
+		$res = find_bank_account($dst_accountnum, "70601".$dst_currency."%0001", $dst_corr_accountnum, $mysqli);
+		if ($res != "")
+			return res;
 
-		$mysqli->query("BEGIN");
-	
-	 	$sum = standart_sum($sum);	
-		
-		$stmt = $mysqli->prepare("SELECT cost, buy FROM converter WHERE current = 1 AND currency = ?");
-		$stmt->bind_param("s", $debit_currency);
-		$stmt->execute();	
-		$data = $stmt->get_result()->fetch_row();
-		$debit_sum = $sum * $data[0] - $sum * $data[1];
-		$stmt = $mysqli->prepare("SELECT cost, sell FROM converter WHERE current = 1 AND currency = ?");
-		$stmt->bind_param("s", $credit_currency);
-		$stmt->execute();
-		$data = $stmt->get_result()->fetch_row();
-		$credit_sum = $sum * $data[1] - $sum * $data[0];
-		$bank_income_accountnum = "70601810500000000001";
-		$bank_income_sum = $debit_sum + $credit_sum;	
-                
-		$stmt = $mysqli->prepare("INSERT INTO operations (db, cr, operdate, sum, employee) VALUES (?, ?, (" .
-			"SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
-		$temp_sum = $sum + $debit_sum;
-		$stmt->bind_param("ssss", $debit_accountnum, $convert_debit_accountnum, $sum, $user);
-		$stmt->execute();
+		// от клиента - банку
+		$src_rur_sum = round_sum($sum);
+		if ($src_currency == "810") { // рубли
+			$rur_corr_accountnum = "";
+			$res = find_bank_account($src_accountnum, "70601810%0001", $rur_corr_accountnum, $mysqli);
+			if ($res != "")
+				return $res;
+			$res = transaction($rur_corr_accountnum, $src_accountnum, $src_rur_sum, $user, $mysqli);
+			if ($res != "")
+				return $res;
+		}
+		else { // валюта, нужно обменять по "низкому" курсу
+			$stmt = $mysqli->prepare("SELECT buy FROM converter WHERE current = 1 AND currency = ?");
+			$stmt->bind_param("s", $src_currency);
+			$stmt->execute();
+			$row = $stmt->get_result()->fetch_row();
+			if (!$row)
+				return "Не установлены курсы продажи " . $src_currency;
+			$rate = $row[0];
+			$src_rur_sum = round_sum($sum * $rate); // рублевый эквивалент по курсу продажи
+			//addlog(111);
+			$res = transaction($src_corr_accountnum, $src_accountnum, round_sum($sum), $user, $mysqli);
+			//addlog(222);
+			if ($res != "")
+				return $res;
+		}
 
-		$conv_sum = convert_sum($sum, $debit_currency, $credit_currency);
-		$stmt->bind_param("ssss", $convert_credit_accountnum, $credit_accountnum, $conv_sum, $user);
-		$stmt->execute();
+		//addlog("src_rur_sum = $src_rur_sum");
 
-		$stmt->bind_param("ssss", $convert_rub_accountnum, $bank_income_accountnum, $bank_income_sum, $user);
-		$stmt->execute();
-	
-                $mysqli->query("COMMIT");
-		
-		return;
+		// от банка - клиенту
+		if ($dst_currency == "810") { // рубли
+			$rur_corr_accountnum = "";
+			$res = find_bank_account($dst_accountnum, "70601810%0001", $rur_corr_accountnum, $mysqli);
+			if ($res != "")
+				return $res;
+			$res = transaction($dst_accountnum, $rur_corr_accountnum, $src_rur_sum, $user, $mysqli);
+			if ($res != "")
+				return $res;
+		}
+		else { // валюта, нужно обменять по "высокому" курсу
+			$stmt = $mysqli->prepare("SELECT sell FROM converter WHERE current = 1 AND currency = ?");
+			$stmt->bind_param("s", $dst_currency);
+			$stmt->execute();
+			$row = $stmt->get_result()->fetch_row();
+			if (!$row)
+				return "Не установлены курсы покупки " . $src_currency;
+			$rate = $row[0];
+			$dst_sum = round_sum($src_rur_sum / $rate);
+			//addlog("dst_sum = $dst_sum");
+			$res = transaction($dst_accountnum, $dst_corr_accountnum, $dst_sum, $user, $mysqli);
+			if ($res != "")
+				return $res;
+		}
+
+		return "";
 	}
 
 	function add_months($date, $cntm) {

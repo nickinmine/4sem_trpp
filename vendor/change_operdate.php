@@ -12,39 +12,60 @@
 		return;
 	}
 	$mysqli->query("BEGIN");
-
-	// пересчет процентов по вкладам
-	$deposits = $mysqli->query("SELECT id FROM deposits WHERE closedate = '0000-00-00'");
-	foreach ($deposits as $result) {
-		$id = $result["id"];
-		//addlog("Расчет вклада " . $id);
-		$res = update_deposit($id, $new_date, $_SESSION["user"]["login"]);
-		//addlog("Результат " . $res);
-		if ($res != "") {
-			$_SESSION['message-operdate'] = "Ошибка при пересчете вкладов.\n" . $res;
-			header('Location: ../acc.php#change_operdate');
+	try {
+		function verify($res, $msg) {
+			if (!$res) throw new Exception($msg);
 		}
-	}
 
-	// пересчет остатков на счетах, процентов по вкладам, погашению кредитов...
-	$stmt = $mysqli->prepare("SELECT DISTINCT db FROM operations WHERE operdate >= ? UNION " . 
-		"SELECT DISTINCT cr FROM operations WHERE operdate >= ?");
-	$stmt->bind_param("ss", $current_date, $current_date);
-	$stmt->execute();
-	$accounts = $stmt->get_result()->fetch_all(MYSQLI_NUM);
-
-	foreach ($accounts as $acc) {
-		$acc_balance = check_balance($acc[0]);
-		$stmt->prepare("INSERT INTO balance (account, dt, sum) VALUES (?, ?, ?)");
-		$stmt->bind_param("ssd", $acc[0], $current_date, $acc_balance);
+		//addlog("пересчет баланса $current_date");
+		// пересчет остатков на счетах
+		$stmt = $mysqli->prepare("SELECT DISTINCT db FROM operations WHERE operdate >= ? UNION " . 
+			"SELECT DISTINCT cr FROM operations WHERE operdate >= ?");
+		$stmt->bind_param("ss", $current_date, $current_date);
 		$stmt->execute();
+		$accounts = $stmt->get_result()->fetch_all(MYSQLI_NUM);
+        
+		foreach ($accounts as $acc) {
+			$acccurr = "";
+			$acctype = "";
+			$acc_balance = check_balance2($acc[0], $acccurr, $acctype, $mysqli) * sign_acctype($acctype);
+			//addlog("balance " . $acc[0] . ": $acc_balance");
+			$stmt->prepare("DELETE FROM balance WHERE account = ? AND dt = ?");
+			$stmt->bind_param("ss", $acc[0], $current_date);
+			verify($stmt->execute(), "Ошибка 1 сохранения баланса по счету " . $acc[0]);
+			$stmt->prepare("INSERT INTO balance (account, dt, sum) VALUES (?, ?, ?)");
+			$stmt->bind_param("ssd", $acc[0], $current_date, $acc_balance);
+			verify($stmt->execute(), "Ошибка 2 сохранения баланса по счету " . $acc[0]);
+		}
+		
+		// обновление даты
+		$mysqli->query("UPDATE operdays SET current = 0 WHERE current = 1");
+		$stmt = $mysqli->prepare("INSERT INTO operdays (operdate, current) VALUES (?, 1)");
+		$stmt->bind_param("s", $new_date);
+		verify($stmt->execute(), "Ошибка установки новой даты операционного дня");
+
+		// пересчет процентов по вкладам
+		$result = $mysqli->query("SELECT id FROM deposits WHERE closedate = '0000-00-00'");
+		$deposits = array();
+		while($row = $result->fetch_assoc())
+			$deposits[] = $row;
+		foreach ($deposits as $dep) {
+			$id = $dep["id"];
+			//addlog("Расчет вклада " . $id);
+			$res = update_deposit($id, $new_date, $_SESSION["user"]["login"], $mysqli);
+			//addlog("Результат " . $res);
+			verify($res == "", "Ошибка при пересчете вклада $id.\n$res");
+		}
+		// погашение кредитов
+		// !!!
+        
 	}
-	
-	// обновление даты
-	$mysqli->query("UPDATE operdays SET current = 0 WHERE current = 1");
-	$stmt = $mysqli->prepare("INSERT INTO operdays (operdate, current) VALUES (?, 1)");
-	$stmt->bind_param("s", $new_date);
-	$stmt->execute();
+	catch (Exception $e) {
+		$mysqli->query("ROLLBACK");
+		$_SESSION['message-operdate'] = $e->getMessage();
+		header('Location: ../acc.php#change_operdate');
+		return;
+	}
 	
 	$mysqli->query("COMMIT");                                                             
 

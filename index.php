@@ -2,11 +2,13 @@
 	require "vendor/lib.php";
 
 	safe_session_start();
-	if (($_SESSION["user"]["role"] == "admin") || ($_SESSION["user"]["role"] == "operator")) {
-		header('Location: /oper.php');
-	}
-	else if ($_SESSION["user"]["role"] == "accountant") {
-		header('Location: /acc.php');
+	if (in_array("user", $_SESSION) && in_array("role", $_SESSION["user"])) {
+		if (($_SESSION["user"]["role"] == "admin") || ($_SESSION["user"]["role"] == "operator")) {
+			header('Location: /oper.php');
+		}
+		else if ($_SESSION["user"]["role"] == "accountant") {
+			header('Location: /acc.php');
+		}
 	}
 ?>
 <!DOCTYPE html>
@@ -23,7 +25,7 @@
 <div class="app-router-container">
 	<div class="auth-form">
 		<form action="vendor/signin.php" method="post">
-			<p class="form-name">ТРПП Банк<br>Версия beta-1.3.7</p>
+			<p class="form-name">ТРПП Банк<br>Версия beta-1.4.2</p>
 			<label>Логин</label>
 			<label>
 				<input type="text" name="login" placeholder="Введите логин" required>

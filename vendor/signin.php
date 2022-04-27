@@ -1,6 +1,5 @@
 <?php
 	require "lib.php";
-
 	safe_session_start();	                   	
 
 	$login = $_POST['login'];

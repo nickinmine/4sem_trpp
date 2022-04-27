@@ -106,7 +106,7 @@
 			</div>
    			<div class="form">
 				<a class="anchor" id="create_account"></a>
-				<div class="form-name"><p>Создать новый счет</p></div>
+				<div class="form-name"><p>Открыть новый счет</p></div>
 				<form action="vendor/create_account.php" method="POST">
 					<div class="form-content">
 						<p>Выберите валюту нового счёта</p>
@@ -121,7 +121,7 @@
 							}
 						?>
 					</div>
-					<div><input class="button" type="submit" value="Создать" title="Открыть новый счёт"></div>
+					<div><input class="button" type="submit" value="Открыть" title="Открыть новый счёт"></div>
 					<label class="report"><?php echo session_message("message-client"); ?></label>
 				</form>
 			</div>
@@ -232,10 +232,7 @@
 					<div>
 						<input class="button" type="submit" value="Перевести" title="Перевести средства на выбранный счёт получателя">
 					</div>
-					<label class="report"><?php
-							echo $_SESSION["message-transaction_out"];
-							unset($_SESSION["message-transaction_out"]);
-						?></label>
+					<label class="report"><?php echo session_message("message-transaction_out"); ?></label>
 				</form>
 			</div>
 			<div class="form">
@@ -258,7 +255,7 @@
 						<label>Сумма вклада<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
-						<input class="button" type="submit" value="Открыть" title="Открыть выбранный вклад">
+						<input class="button" type="submit" value="Открыть" title="Открыть выбранный вид вклада">
 					</div>
 					<label class="report"><?php echo session_message("message-create_deposit"); ?></label>
 				</form>
@@ -285,8 +282,34 @@
 					<label class="report"><?php echo session_message("message-close_deposit"); ?></label>
 				</form>
 			</div>
+
+			<!-- -------------------- КРЕДИТЫ -------------------- -->
+			<div class="form">
+				<a class="anchor" id="create_credit"></a>
+				<div class="form-name"><p>Выдача кредита</p></div>
+				<form action="vendor/create_credit.php" method="POST">
+					<div class="form-content"><p>Вид кредита</p>
+						<label><div class="select-block"><select name="type" required>
+							<option selected></option>
+							<?php echo out_credit_box(); ?>
+						</select></div></label>
+					</div>
+                    			<div>
+						<label>Сумма кредита<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+					</div>
+					<div>
+						<input class="button" type="submit" value="Выдача" title="Выдача кредита по выбранным условиям">
+					</div>
+					<label class="report"><?php echo session_message("message-create_credit"); ?></label>
+				</form>
+			</div>
+
+			<!--  -->
+
+
 		</div>
 		<div class="air"></div>
+
 	</div>
 </main>
 </body>

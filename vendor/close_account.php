@@ -3,7 +3,7 @@
 
 	safe_session_start();
 
-	if (substr($_POST["accountnum"], 0, 5) != "40800") {
+	if (substr($_POST["accountnum"], 0, 5) != "40817") {
 		$_SESSION["message-close"] = "Невозможно закрыть служебный счет.";
 		header("Location: ../operwork.php#close_account");
 		return;

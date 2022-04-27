@@ -1,32 +1,22 @@
 <?php
 	require "lib.php";
-
 	safe_session_start();       
 	
 	$mysqli = get_sql_connection();
 
-	$stmt = $mysqli->prepare("SELECT currency FROM account WHERE accountnum = ?");
-	$stmt->bind_param("s", $_POST["debit_accountnum"]);
-	$stmt->execute();
-	$debit_currency = $stmt->get_result()->fetch_row()[0];
-        
-	$stmt = $mysqli->prepare("SELECT currency FROM account WHERE accountnum = ?");
-	$stmt->bind_param("s", $_POST["credit_accountnum"]);
-	$stmt->execute();
-	$credit_currency = $stmt->get_result()->fetch_row()[0];
+	$debit_currency = get_account_currency($_POST["debit_accountnum"], $mysqli);
+	$credit_currency = get_account_currency($_POST["credit_accountnum"], $mysqli);
 
-	if ($_POST["debit_accountnum"] == $_POST["credit_accountnum"]) {
-		$_SESSION["message-transaction_acc"] = "Выберите разные счета.";
-        	header("Location: ../acc.php#transaction_acc");
-		return;
-	}	
-	if ($credit_currency != $debit_currency) {        
-		conversion($_POST["debit_accountnum"], $_POST["credit_accountnum"], $_POST["sum"], $_SESSION["user"]["login"]);
-                $_SESSION["message-transaction_in"] = "Успешный перевод с конвертацией валют.";
-        	header("Location: ../acc.php#transaction_acc");
+	if ($credit_currency != $debit_currency) {
+		//conversion($_POST["debit_accountnum"], $_POST["credit_accountnum"], $_POST["sum"], $_SESSION["user"]["login"]);
+		//$_SESSION["message-transaction_in"] = "Успешный перевод с конвертацией валют.";
+		// конвертация по курсу покупки/продажи не имеет смысла, т.к. доходы с курсовой разницы все равно попадут на счет банка
+		// вместо этого лучше сделать перевод между нужными счетами и счетами доходов/расходов банка с соответствующей валютой.
+		$_SESSION["message-transaction_acc"] = "Выберите счета с одной и той же валютой."; 
+		header("Location: ../acc.php#transaction_acc");
 		return;
 	}
-	$res = transaction($_POST["debit_accountnum"], $_POST["credit_accountnum"], $_POST["sum"], $_SESSION["user"]["login"]);
+	$res = transaction($_POST["debit_accountnum"], $_POST["credit_accountnum"], round_sum($_POST["sum"]), $_SESSION["user"]["login"], $mysqli);
 	if ($res != "") {
 		$_SESSION["message-transaction_acc"] = "Ошибка перевода." . $res;
         	header("Location: ../acc.php#transaction_acc");

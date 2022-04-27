@@ -21,9 +21,7 @@
 	<link rel="stylesheet" href="css/navbar.css">
 	<link rel="stylesheet" href="css/main-container.css">
 	<link rel="icon" type="image/png" href="images/favicon.png">
-	<title>Бухгалтер<?php
-		echo " - " . $_SESSION['user']['name']
-		?></title>
+	<title>Бухгалтер<?php echo " - " . $_SESSION['user']['name']; ?></title>
 </head>
 <body>
 <header class="header">
@@ -65,13 +63,13 @@
 		<a class="anchor" id="transaction_acc"></a>
 		<div class="form-name"><p>Перевод средств между кассами и счетами банка</p></div>
 		<form action="vendor/transaction_acc.php" method="POST">
-			<div class="form-content"><p>Счет отправки перевода</p>
+			<div class="form-content"><p>Счет отправки перевода (дебета)</p>
 				<label><div class="select-block"><select name="debit_accountnum" required>
 					<option selected></option>
 					<?php echo out_account_box(1, "out_acc"); ?>
 				</select></div></label>
 			</div>
-			<div class="form-content"><p>Счет приема перевода</p>
+			<div class="form-content"><p>Счет приема перевода (кредита)</p>
 				<label><div class="select-block"><select name="credit_accountnum" required>
 					<option selected></option>
 					<?php echo out_account_box(1, "out_acc"); ?>
