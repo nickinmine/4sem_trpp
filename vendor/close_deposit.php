@@ -10,10 +10,6 @@
 
 	$mysqli->query("BEGIN");
 	try {
-		function verify($res, $msg) {
-			if (!$res) throw new Exception($msg);
-		}
-
 		$stmt = $mysqli->prepare("SELECT mainacc, percacc, IFNULL(capdate, opendate) capdate FROM deposits WHERE id = ?");	
 		$stmt->bind_param("i", $id);
 		$stmt->execute();
@@ -22,9 +18,6 @@
 		$sum = check_balance($mainacc);
 		$percacc = $result["percacc"];
 		$capdate = $result["capdate"];
-		
-		//addlog($mainacc . " " . $percacc . " " . $update);
-		//addlog($id);
 		
 		$row = $mysqli->query("SELECT operdate FROM operdays WHERE current = 1")->fetch_row();
 		verify($row, "Не найден текущий рабочий день");
@@ -39,7 +32,6 @@
 			$res = transaction($src_bank_accountnum, $percacc, $oldsum, $user, $mysqli);
 			verify($res == "", "Внутренняя транзакция 0 не проведена. $res");
 		}		
-                //addlog($operdate . " > " . $update);
                                                     
 		if ($operdate > $capdate) { // после последней капитализации начисляем по ставке "до востребования"
 			$rate = $mysqli->query("SELECT rate FROM depositeterms WHERE `type` = 'dv'")->fetch_row()[0];	
@@ -59,7 +51,7 @@
 		$res = transaction($outacc, $mainacc, $sum, $user, $mysqli); // вывод средств со вклада
 		verify($res == "", "Транзакция на внешний счет не проведена. $res");
 
-		//addlog("Баланс основного счета ($mainacc): " . sprintf("%.6f", check_balance($mainacc)));
+		//addlog("Баланс основного счета ($mainacc): " . sprintf("%.6f", check_balance($mainacc, $mysqli)));
 		$res = close_account($mainacc, $mysqli);
 		verify($res == "", "Основной счет вклада не закрыт. " . $res);
 		$res = close_account($percacc, $mysqli);

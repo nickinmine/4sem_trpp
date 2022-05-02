@@ -13,13 +13,11 @@
 	}
 	$mysqli->query("BEGIN");
 	try {
-		function verify($res, $msg) {
-			if (!$res) throw new Exception($msg);
-		}
-
 		//addlog("пересчет баланса $current_date");
 		// пересчет остатков на счетах
-		$stmt = $mysqli->prepare("SELECT DISTINCT db FROM operations WHERE operdate >= ? UNION " . 
+		$stmt = $mysqli->prepare(
+			"SELECT DISTINCT db FROM operations WHERE operdate >= ? ".
+			"  UNION " . 
 			"SELECT DISTINCT cr FROM operations WHERE operdate >= ?");
 		$stmt->bind_param("ss", $current_date, $current_date);
 		$stmt->execute();
@@ -47,7 +45,7 @@
 		// пересчет процентов по вкладам
 		$result = $mysqli->query("SELECT id FROM deposits WHERE closedate = '0000-00-00'");
 		$deposits = array();
-		while($row = $result->fetch_assoc())
+		while ($row = $result->fetch_assoc())
 			$deposits[] = $row;
 		foreach ($deposits as $dep) {
 			$id = $dep["id"];
@@ -56,20 +54,32 @@
 			//addlog("Результат " . $res);
 			verify($res == "", "Ошибка при пересчете вклада $id.\n$res");
 		}
+
 		// погашение кредитов
-		// !!!
-        
+		addlog("// погашение кредитов");
+		$result = $mysqli->query("SELECT id FROM credits WHERE (closedate = '0000-00-00' OR closedate IS NULL)");
+		$credits = [];
+		while ($row = $result->fetch_assoc())
+			$credits[] = $row;
+		addlog("кол-во: " . count($credits));
+		foreach ($credits as $cred) {
+			$id = $cred["id"];
+			addlog("Расчет кредита " . $id);
+			$res = update_credit($id, $new_date, $_SESSION["user"]["login"], $mysqli);
+			//addlog("Результат " . $res);
+			verify($res == "", "Ошибка при пересчете кредита $id.\n$res");
+		}
+
+		// сохранение всех изменений
+		$mysqli->query("COMMIT");                                                             
+		$_SESSION['message-operdate'] = "Установлена дата " . date("d.m.Y", strtotime($new_date));
+		header('Location: ../acc.php#change_operdate');
 	}
 	catch (Exception $e) {
 		$mysqli->query("ROLLBACK");
+		addlog("Ошибка change_operdate(): " . $e->getMessage());
 		$_SESSION['message-operdate'] = $e->getMessage();
 		header('Location: ../acc.php#change_operdate');
-		return;
 	}
-	
-	$mysqli->query("COMMIT");                                                             
-
-	$_SESSION['message-operdate'] = "Установлена дата " . date("d.m.Y", strtotime($new_date));
-	header('Location: ../acc.php#change_operdate');
 
 ?>

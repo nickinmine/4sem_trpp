@@ -21,7 +21,6 @@
 
 	if ($deposit_currency != $accountnum_currency) {
 		$_SESSION["message-create_deposit"] = "Валюта выбранного вклада и счета не совпадают.";
-		//addlog("$deposit_currency != $accountnum_currency");
 		header("Location: ../operwork.php#create_deposit");
 		return;
 	}

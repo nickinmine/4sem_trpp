@@ -67,11 +67,6 @@
 					<label class="message"><?php echo session_message("message-client"); ?></label>
 				</form>
 			</div>
-
-			<div class="form">
-				<div class="form-name"><p>Удаление клиента???</p></div>
-				<form></form>
-			</div>
 		</div>
 		<div class="column2">
 			<div class="form">

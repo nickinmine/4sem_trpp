@@ -25,7 +25,7 @@
 <div class="app-router-container">
 	<div class="auth-form">
 		<form action="vendor/signin.php" method="post">
-			<p class="form-name">ТРПП Банк<br>Версия beta-1.4.2</p>
+			<p class="form-name">ТРПП Банк<br>Версия beta-1.3.7</p>
 			<label>Логин</label>
 			<label>
 				<input type="text" name="login" placeholder="Введите логин" required>

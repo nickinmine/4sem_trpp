@@ -51,6 +51,7 @@ label{
 .access-error{margin-top: 100px;}
 .message{color:red;}
 .report{color:inherit;}
+.information{color: darkblue;}
 .form-name>p{
 	text-align: center;
 	font: inherit;

@@ -104,6 +104,8 @@
 					<label class="report"><?php echo session_message("message-edit"); ?></label>
 				</form>
 			</div>
+
+			<!-- -------------------- СЧЕТА -------------------- -->
    			<div class="form">
 				<a class="anchor" id="create_account"></a>
 				<div class="form-name"><p>Открыть новый счет</p></div>
@@ -130,6 +132,7 @@
 				<a class="anchor" id="close_account"></a>
 				<div class="form-name"><p>Закрыть счет</p></div>
 				<form action="vendor/close_account.php" method="POST">
+					<?php if (client_account_count($_SESSION["client"]["id"], true) > 0) { /* есть счета 40817 с нулевым остатком */  ?>
 					<div class="form-content">
 						<p>Выберите счет</p>
 						<label><div class="select-block"><select name="accountnum" required>
@@ -141,6 +144,9 @@
 						<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный счёт">
 					</div>
 					<label class="report"><?php echo session_message("message-close"); ?></label>
+					<?php } else { /* нет подходящих счетов */ ?>
+					<label class="information">Нет счетов с нулевым остатком</label>
+					<?php } ?>
 				</form>
 			</div>
 		</div>
@@ -149,6 +155,7 @@
 				<a class="anchor" id="push_account"></a>
 				<div class="form-name"><p>Пополнить счет</p></div>
 				<form action="vendor/push_account.php" method="POST">
+					<?php if (client_account_count($_SESSION["client"]["id"], false) > 0) { /* есть счета 40817 */  ?>
 					<div class="form-content">
 						<p>Выберите счет</p>
 						<label><div class="select-block"><select name="credit_accountnum" required>
@@ -157,12 +164,15 @@
 						</select></div></label>
 					</div>
 					<div>
-						<label>Сумма пополнения<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+						<label>Сумма пополнения<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Пополнить" title="Пополнить выбранный счёт">
 					</div>
 					<label class="report"><?php echo session_message("message-push"); ?></label>
+					<?php } else { /* нет подходящих счетов */ ?>
+					<label class="information">Нет открытых счетов</label>
+					<?php } ?>
 				</form>
 			</div>
 
@@ -170,6 +180,7 @@
 				<a class="anchor" id="pop_account"></a>
 				<div class="form-name"><p>Снять средства со счета</p></div>
 				<form action="vendor/pop_account.php" method="POST">
+					<?php if (client_account_count($_SESSION["client"]["id"], false) > 0) { /* есть счета 40817 */  ?>
 					<div class="form-content">
 						<p>Выберите счет</p>
 						<label><div class="select-block"><select name="debit_accountnum" required>
@@ -178,12 +189,15 @@
 						</select></div></label>
 					</div>
 					<div>
-						<label>Сумма снятия<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+						<label>Сумма снятия<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Снять" title="Снять средства с выбранного счёта">
 					</div>
 					<label class="report"><?php echo session_message("message-pop"); ?></label>
+					<?php } else { /* нет подходящих счетов */ ?>
+					<label class="information">Нет открытых счетов</label>
+					<?php } ?>
 				</form>
 			</div>
 
@@ -191,6 +205,7 @@
 				<a class="anchor" id="transaction_in"></a>
 				<div class="form-name"><p>Перевод средств между своими счетами</p></div>
 				<form action="vendor/transaction_in.php" method="POST">
+					<?php if (client_account_count($_SESSION["client"]["id"], false) > 0) { /* есть счета 40817 */  ?>
 					<div class="form-content"><p>Счет отправки перевода</p>
 						<label><div class="select-block"><select name="debit_accountnum" required>
 							<option selected></option>
@@ -204,12 +219,15 @@
 						</select></div></label>
 					</div>
 					<div>
-						<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+						<label>Сумма перевода<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Перевести" title="Перевести со счёта на счёт">
 					</div>
 					<label class="report"><?php echo session_message("message-transaction_in"); ?></label>
+					<?php } else { /* нет подходящих счетов */ ?>
+					<label class="information">Нет открытых счетов</label>
+					<?php } ?>
 				</form>
 			</div>
 
@@ -217,6 +235,7 @@
 				<a class="anchor" id="transaction_out"></a>
 				<div class="form-name"><p>Перевод средств другому клиенту</p></div>
 				<form action="vendor/transaction_out.php" method="POST">
+					<?php if (client_account_count($_SESSION["client"]["id"], false) > 0) { /* есть счета 40817 */  ?>
 					<div class="form-content"><p>Счет отправки перевода</p>
 						<label><div class="select-block"><select name="debit_accountnum" required>
 							<option selected></option>
@@ -224,25 +243,31 @@
 						</select></div></label>
 					</div>
 					<div>
-						<label>Перевод клиенту с номером телефона:<input type="tel" name="credit_phone" required placeholder="Номер телефона"></label>
+						<label>Перевод клиенту по номеру телефона:<input type="tel" name="credit_phone" required placeholder="Номер телефона"></label>
 					</div>
 					<div>
-						<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+						<label>Сумма перевода<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Перевести" title="Перевести средства на выбранный счёт получателя">
 					</div>
-					<label class="report"><?php echo session_message("message-transaction_out"); ?></label>
+					<label class="report"><?php echo session_message("message-transaction_in"); ?></label>
+					<?php } else { /* нет подходящих счетов */ ?>
+					<label class="information">Нет открытых счетов</label>
+					<?php } ?>
 				</form>
 			</div>
+
+			<!-- -------------------- ВКЛАДЫ -------------------- -->
 			<div class="form">
 				<a class="anchor" id="create_deposit"></a>
 				<div class="form-name"><p>Открытие вклада</p></div>
 				<form action="vendor/create_deposit.php" method="POST">
+					<?php if (client_account_count($_SESSION["client"]["id"], false) > 0) { /* есть счета 40817 */  ?>
 					<div class="form-content"><p>Вид вклада</p>
 						<label><div class="select-block"><select name="type" required>
 							<option selected></option>
-							<?php echo out_deposit_box(); ?>
+							<?php echo out_deposit_terms_box(); ?>
 						</select></div></label>
 					</div>
 					<div class="form-content"><p>Средства для вклада будут взяты со счета</p>
@@ -252,18 +277,24 @@
 						</select></div></label>
 					</div>
                     			<div>
-						<label>Сумма вклада<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+						<label>Сумма вклада<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Открыть" title="Открыть выбранный вид вклада">
 					</div>
 					<label class="report"><?php echo session_message("message-create_deposit"); ?></label>
+					<?php } else { /* нет подходящих счетов */ ?>
+					<label class="information">Нет открытых счетов</label>
+					<?php } ?>
 				</form>
 			</div>
+
+
 			<div class="form">
 				<a class="anchor" id="close_deposit"></a>
 				<div class="form-name"><p>Закрытие вклада</p></div>
 				<form action="vendor/close_deposit.php" method="POST">
+					<?php if (client_deposit_count($_SESSION["client"]["id"]) > 0) {  /* есть действующие вклады */ ?>
 					<div class="form-content"><p>Выберите вклад</p>
 						<label><div class="select-block"><select name="id" required>
 							<option selected></option>
@@ -280,8 +311,13 @@
 						<input class="button" type="submit" value="Закрыть" title="Закрыть выбранный вклад">
 					</div>
 					<label class="report"><?php echo session_message("message-close_deposit"); ?></label>
+					<?php } else { /* нет действующих вкладов */?>
+					<label class="information">Нет действующих вкладов</label>
+					<?php } ?>
 				</form>
+
 			</div>
+
 
 			<!-- -------------------- КРЕДИТЫ -------------------- -->
 			<div class="form">
@@ -291,11 +327,11 @@
 					<div class="form-content"><p>Вид кредита</p>
 						<label><div class="select-block"><select name="type" required>
 							<option selected></option>
-							<?php echo out_credit_box(); ?>
+							<?php echo out_credit_terms_box(); ?>
 						</select></div></label>
 					</div>
                     			<div>
-						<label>Сумма кредита<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+						<label>Сумма кредита<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 					</div>
 					<div>
 						<input class="button" type="submit" value="Выдача" title="Выдача кредита по выбранным условиям">
@@ -304,7 +340,47 @@
 				</form>
 			</div>
 
-			<!--  -->
+			<div class="form">
+				<a class="anchor" id="graph_credit"></a>
+				<div class="form-name"><p>Просмотр состояния и графика погашения по кредиту</p></div>
+				<form action="graph_credit.php" method="POST">
+					<?php if (client_credit_count($_SESSION["client"]["id"]) > 0) {  /* есть действующие кредиты */ ?>
+					<div class="form-content"><p>Вид кредита</p>
+						<label><div class="select-block"><select name="idcred" required>
+							<option selected></option>
+							<?php echo out_client_credit_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
+					</div>
+					<div>
+						<input class="button" type="submit" value="Состояние" title="Просмотр состояния кредита">
+					</div>
+					<label class="report"><?php echo session_message("message-graph_credit"); ?></label>
+					<?php } else { /* нет действующих кредитов */?>
+					<label class="information">Нет действующих кредитов</label>
+					<?php } ?>
+				</form>
+			</div>
+
+			<div class="form">
+				<a class="anchor" id="close_credit"></a>
+				<div class="form-name"><p>Закрытие кредита</p></div>
+				<form action="vendor/close_credit.php" method="POST">
+					<?php if (client_credit_count($_SESSION["client"]["id"]) > 0) {  /* есть действующие кредиты */ ?>
+					<div class="form-content"><p>Вид кредита</p>
+						<label><div class="select-block"><select name="idcred" required>
+							<option selected></option>
+							<?php echo out_client_credit_box($_SESSION["client"]["id"]); ?>
+						</select></div></label>
+					</div>
+					<div>
+						<input class="button" type="submit" value="Закрыть" title="Закрытие кредита">
+					</div>
+					<label class="report"><?php echo session_message("message-close_credit"); ?></label>
+					<?php } else { /* нет действующих кредитов */?>
+					<label class="information">Нет действующих кредитов</label>
+					<?php } ?>
+				</form>
+			</div>
 
 
 		</div>

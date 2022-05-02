@@ -1,7 +1,7 @@
 <?php
 	require_once "lib.php";
 	
-	function out_deposit_box() {
+	function out_deposit_terms_box() {
 		$mysqli = get_sql_connection();
 		$result = $mysqli->query("SELECT descript, `type` FROM depositeterms WHERE `type` NOT IN('dv')");
 		$str = "";
@@ -16,7 +16,7 @@
 		$stmt = $mysqli->prepare("SELECT idclient, currency FROM account WHERE accountnum = ?");
 		$stmt->bind_param("s", $src_accountnum);
 		if (!$stmt->execute())
-			return $mysqli->error;
+			return "MySQL error: " . $mysqli->error;
 		$data = $stmt->get_result()->fetch_row();
 		$idclient = $data[0];
 		$currency = $data[1];
@@ -40,7 +40,7 @@
 			"VALUES (?, ?, (SELECT operdate FROM operdays WHERE current = 1), '0000-00-00', ?, ?, (SELECT operdate FROM operdays WHERE current = 1))");
 		$stmt->bind_param("isss", $idclient, $type, $mainacc, $percacc);
 		if (!$stmt->execute()) {       
-			return $mysqli->error;
+			return "MySQL error: " . $mysqli->error;
 		}
 		return "";
 	}
@@ -50,7 +50,7 @@
 		$stmt = $mysqli->prepare("SELECT * FROM deposits WHERE id = ?");
 		$stmt->bind_param("i", $id);
 		if (!$stmt->execute()) {
-			return $mysqli->error;
+			return "MySQL error: " . $mysqli->error;
 		}
 		$res = $stmt->get_result()->fetch_assoc();
 		$type = $res["type"];
@@ -62,7 +62,7 @@
 		$stmt = $mysqli->prepare("SELECT cap, monthcnt, rate, currency FROM depositeterms WHERE `type` = ?");
 		$stmt->bind_param("s", $type);
 		if (!$stmt->execute())
-			return $mysqli->error;
+			return "MySQL error: " . $mysqli->error;
 		$res = $stmt->get_result()->fetch_assoc();
 		$modify = $res["cap"];
 		$monthcnt = $res["monthcnt"];
@@ -101,7 +101,7 @@
 			//addlog("нач. %%: sum = $sum; period = [" . $update . " - " . $capdate[$i] . "]; mainaccbalance = " . check_balance($mainacc, $mysqli));
 			$res = transaction($percacc, $src_bank_accountnum, $sum, $user, $mysqli);
 			if ($res != "")
-				return $mysqli->error;
+				return "MySQL error: " . $mysqli->error;
 			$percsum = check_balance($percacc, $mysqli);
 			//addlog("капитализация %%: sum = $percsum;");
 			$res = transaction($mainacc, $percacc, $percsum, $user, $mysqli);
@@ -128,7 +128,7 @@
 		//addlog("\r\n\r\n");
 		return "";                            			
 	}
-	
+
 	function out_client_deposit_box($idclient) {
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare(
@@ -147,6 +147,15 @@
 				", окончание " . out_date($res["enddate"]) . "</option>\n";
 		}
 		return $str;
+	}
+
+	function client_deposit_count($idclient) { // кол-во действующих вкладов у клиента
+		$mysqli = get_sql_connection();
+		$stmt = $mysqli->prepare("SELECT COUNT(*) FROM deposits d WHERE d.idclient = ? AND d.closedate = '0000-00-00'");
+		$stmt->bind_param("i", $idclient);
+		$stmt->execute();
+		$cnt = $stmt->get_result()->fetch_row()[0];
+		return $cnt;
 	}
 	
 ?>

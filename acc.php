@@ -77,7 +77,7 @@
 			</div>
 
 			<div>
-				<label>Сумма перевода<input pattern="^\d+([\.,]\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
+				<label>Сумма перевода<input pattern="^\d+(\.\d{1,2}|)$" name="sum" required placeholder="100.00"></label>
 			</div>
 			<div>
 				<input class="button" type="submit" value="Перевести" title="Перевести указанную сумму между счетами банка">
@@ -104,9 +104,9 @@
 							}
 						?>
 					</div>
-					<div><label>Стоимость покупки в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="buy_sum" required placeholder="100.00"></label></div>
-					<div><label>Стоимость, установленная ЦБ в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="cost_sum" required placeholder="100.00"></label></div>
-					<div><label>Стоимость продажи в рублях<input pattern="^\d+([\.,]\d{1,2}|)$" name="sell_sum" required placeholder="100.00"></label></div>
+					<div><label>Стоимость покупки в рублях<input pattern="^\d+(\.\d{1,2}|)$" name="buy_sum" required placeholder="100.00"></label></div>
+					<div><label>Стоимость, установленная ЦБ в рублях<input pattern="^\d+(\.\d{1,2}|)$" name="cost_sum" required placeholder="100.00"></label></div>
+					<div><label>Стоимость продажи в рублях<input pattern="^\d+(\.\d{1,2}|)$" name="sell_sum" required placeholder="100.00"></label></div>
 					<div><input class="button" type="submit" value="Обновить" title="Обновить текущий курс валют"></div>
 					<label class="report"><?php echo session_message("message-currency_cost"); ?></label>
 				</form>

@@ -21,6 +21,11 @@
 		}
 	}
 
+	function verify($condition, $msg) { // генерация исключения при ложном $condition
+		if (!$condition)
+			throw new Exception($msg);
+	}
+
 	function get_sql_connection() {
 		$mysqli = new mysqli("p:localhost", "root", "", "bankbase"); // исп. постоянные соединения
 		return $mysqli;
@@ -32,43 +37,6 @@
 		if (array_key_exists($key, $_SESSION)) {
 	        	$str = $_SESSION[$key];
 		        unset($_SESSION[$key]);
-		}
-		return $str;
-	}
-
-	function out_account_box($idclient, $descript = "", $out_null = false) {
-		$mysqli = get_sql_connection();
-		$stmt = $mysqli->prepare(
-			"SELECT a.accountnum, c.isocode, a.descript, " .
-			"  CASE WHEN t.`type` = 'active' THEN 'А' WHEN t.`type` = 'passive' THEN 'П' ELSE '?' END typemark " .
-			"FROM account a " .
-			"  LEFT JOIN currency c ON c.code = a.currency " . 
-			"  LEFT JOIN accounttype t ON t.acc2p = SUBSTR(a.accountnum, 1, 5) " .
-			"WHERE closed = '0000-00-00' AND idclient = ? AND accountnum LIKE '40817%'");
-		if ($descript == "out_acc") {
-			$stmt = $mysqli->prepare(
-				"SELECT accountnum, isocode, descript, " .
-				"  CASE WHEN t.`type` = 'active' THEN 'А' WHEN t.`type` = 'passive' THEN 'П' ELSE '?' END typemark " .
-				"FROM account a " .
-				"  LEFT JOIN currency c ON c.code = a.currency " . 
-				"  LEFT JOIN accounttype t ON t.acc2p = SUBSTR(a.accountnum, 1, 5) " .
-				"WHERE closed = '0000-00-00' AND idclient = ?");
-		}
-			
-		$stmt->bind_param("i", $idclient);
-		$stmt->execute();
-		$result = $stmt->get_result();
-		$str = "";
-
-		foreach ($result as $res) {
-			/*$stmt = $mysqli->prepare("SELECT type FROM account WHERE accountnum = ?");
-			$stmt->bind_param("s", $res["accountnum"]);
-			$stmt->execute();
-			$sign = ($stmt->get_result()->fetch_row()[0]) == "active" ? 1 : -1;*/
-			$balance = /*$sign * */check_balance($res["accountnum"]);
-			if (!$out_null || ($out_null && $balance == 0))
-				$str .= '<option value = "' . $res["accountnum"] . '">Счет №' . $res["accountnum"] . ': ' 
-					. sprintf("%.2f", $balance) . ' ' . $res["isocode"] . ', ' . $res["descript"] . ' (' . $res["typemark"] . ')' . '</option>';	                                       	
 		}
 		return $str;
 	}
@@ -115,23 +83,6 @@
 		return 'value="' . $result . '"';
 	}
 
-	/*function convert_sum($sum, $in_currency, $out_currency) {
-		$mysqli = get_sql_connection();
-
-		$stmt = $mysqli->prepare("SELECT buy FROM converter WHERE current = 1 AND currency = ?");
-		$stmt->bind_param("s", $in_currency);
-		$stmt->execute();
-		$sell_sum = $stmt->get_result()->fetch_row()[0];
-		$in_sum = $sum * $sell_sum;
-		
-		$stmt = $mysqli->prepare("SELECT sell FROM converter WHERE current = 1 AND currency = ?");
-		$stmt->bind_param("s", $out_currency);
-		$stmt->execute();
-		$buy_sum = $stmt->get_result()->fetch_row()[0];
-		$out_sum = $in_sum / $buy_sum;
-		
-		return round_sum($out_sum);
-	}*/
 
 	function transaction($debit_accountnum, $credit_accountnum, $psum, $user, $pmysqli = NULL) { // перевод между счетами в одной валютой
 		$mysqli = $pmysqli ?? get_sql_connection();
@@ -150,6 +101,10 @@
 		//addlog("sum = $sum");
 		if ($debit_accountnum == $credit_accountnum)
 			return "Выберите разные счета!";
+		if (!is_account_ready($debit_accountnum, $mysqli))
+			return "Счет дебета $debit_accountnum не существует или закрыт";
+		if (!is_account_ready($credit_accountnum, $mysqli))
+			return "Счет кредита $credit_accountnum не существует или закрыт";
 		if ($dbacccurr != $cracccurr)
 			return "Валюты счетов не совпадают: " . $dbacccurr . " <> " . $cracccurr;
 		if (sign_acctype($dbacctype) > 0 && $dbbal < $sum) // дебет активный, остаток маловат
@@ -164,7 +119,8 @@
 				"(SELECT concat(operdate, ' ', current_time()) FROM operdays WHERE current = 1), ?, ?)");
 			$stmt->bind_param("ssds", $debit_accountnum, $credit_accountnum, $sum, $user);
 			if (!$stmt->execute())
-				return $mysqli->error;
+				return "MySQL error:" . $mysqli->error;
+			//addlog("Создана проводка дб=$debit_accountnum; кр=$credit_accountnum; сумма=$sum");
 		}
 		return "";
 	}
@@ -241,26 +197,21 @@
 	}
 
 	function add_months($date, $cntm) {
-		$d = substr($date, 8, 2);  // день
-		$m = substr($date, 5, 2);  // месяц
-		$y = substr($date, 0, 4);  // год
- 
-		// Прибавить месяцы
-		for ($i = 0; $i < $cntm; $i++) {
+		$d = intval(substr($date, 8, 2), 10);  // день
+		$m = intval(substr($date, 5, 2), 10);  // месяц
+		$y = intval(substr($date, 0, 4), 10);  // год
+
+		for ($i = 0; $i < $cntm; $i++) { // Прибавить месяцы
 			$m++;
 			if ($m > 12) { $y++; $m=1; }
 		}
  
-		// Это последний день месяца?
-		if ($d == date('t', $time)) {
-			$d=31;
-		}
-		// Открутить дату до последнего дня месяца
-		if (!checkdate($m, $d, $y)) {
-			$d = date('t', mktime(0, 0, 0, $m, 1, $y));
-		}
-		// Вернуть новую дату
-		return sprintf("%04d-%02d-%02d", $y, $m, $d);
+		//if ($d == date('t', strtotime($date))) // Это последний день месяца?
+		//	$d=31;
+		while (!checkdate($m, $d, $y) && $d > 28) // коррекция последнего дня месяца
+			$d--;
+
+		return sprintf("%04d-%02d-%02d", $y, $m, $d); // Вернуть новую дату
 	}
 	
 	function out_date($date) {
