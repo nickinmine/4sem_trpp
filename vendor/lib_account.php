@@ -217,11 +217,13 @@
 		$mysqli = get_sql_connection();
 		$stmt = $mysqli->prepare(
 			"SELECT a.accountnum, c.isocode, a.descript, " .
-			"  CASE WHEN t.`type` = 'active' THEN 'А' WHEN t.`type` = 'passive' THEN 'П' ELSE '?' END typemark " .
+			"  CASE WHEN t.`type` = 'active' THEN 'А' WHEN t.`type` = 'passive' THEN 'П' ELSE '?' END typemark " . //, cr.closedate " .
 			"FROM account a " .
 			"  LEFT JOIN currency c ON c.code = a.currency " . 
 			"  LEFT JOIN accounttype t ON t.acc2p = SUBSTR(a.accountnum, 1, 5) " .
-			"WHERE closed = '0000-00-00' AND idclient = ? AND accountnum LIKE '40817%'");
+			//"  LEFT JOIN credits cr ON cr.curacc = a.accountnum " .
+			"WHERE closed = '0000-00-00' AND a.idclient = ? AND accountnum LIKE '40817%'");
+			//"  AND (cr.`type` IS NULL OR cr.closedate IS NOT NULL)";
 		if ($descript == "out_acc") {
 			$stmt = $mysqli->prepare(
 				"SELECT accountnum, isocode, descript, " .

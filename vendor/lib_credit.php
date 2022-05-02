@@ -20,19 +20,19 @@
 		$pcacc = ""; // осн. проценты
 		$prodacc = ""; // проср. долг
 		$prpcacc = ""; // проср. проценты
-		$res = create_account($idclient, "810", "40817", "текущий счет кредита", $curacc, $mysqli);
+		$res = create_account($idclient, "810", "40817", "Текущий счет кредита", $curacc, $mysqli);
 		if ($res != "")
 			return "Не создан текущий счет. " . $res;
-		$res = create_account($idclient, "810", "45505", "учет основного долга по КД", $odacc, $mysqli);
+		$res = create_account($idclient, "810", "45505", "Учет основного долга по КД", $odacc, $mysqli);
 		if ($res != "")
 			return "Не создан счет учета основного долга по КД.";
-		$res = create_account($idclient, "810", "47427", "учет процентов по КД", $pcacc, $mysqli);
+		$res = create_account($idclient, "810", "47427", "Учет процентов по КД", $pcacc, $mysqli);
 		if ($res != "")
 			return "Не создан счет учета процентов по КД.";
-		$res = create_account($idclient, "810", "45815", "учет просроченного долга по КД", $prodacc, $mysqli);
+		$res = create_account($idclient, "810", "45815", "Учет просроченного долга по КД", $prodacc, $mysqli);
 		if ($res != "")
 			return "Не создан счет учета процентов по КД.";
-		$res = create_account($idclient, "810", "45915", "учет просроченных процентов по КД", $prpcacc, $mysqli);
+		$res = create_account($idclient, "810", "45915", "Учет просроченных процентов по КД", $prpcacc, $mysqli);
 		if ($res != "")
 			return "Не создан счет учета процентов по КД.";
 
@@ -405,7 +405,7 @@
 		$str = "";
 		$result = $stmt->get_result();
 		foreach ($result as $res) {
-			$str .= "<option value = \"" . $res["id"] . "\">" . $res["descript"] .
+			$str .= "<option value = \"" . $res["id"] . "\">Кредит №" . $res["id"] . " " . $res["descript"] .
 				", сумма " . standart_sum($res["sumcr"]) . " " . $res["isocode"] .
 				", ставка " . sprintf("%.2f", $res["rate"]). "%". "</option>\n";
 		}

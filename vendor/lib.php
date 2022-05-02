@@ -27,7 +27,7 @@
 	}
 
 	function get_sql_connection() {
-		$mysqli = new mysqli("p:localhost", "root", "", "bankbase"); // исп. постоянные соединения
+		$mysqli = new mysqli("localhost", "root", "", "bankbase"); // исп. постоянные соединения
 		return $mysqli;
 	}
 

@@ -3,7 +3,9 @@
 
 	safe_session_start();
 
-	if (substr($_POST["accountnum"], 0, 5) != "40817") {
+	$accountnum = $_POST["accountnum"];
+	
+	if (substr($accountnum, 0, 5) != "40817") {
 		$_SESSION["message-close"] = "Невозможно закрыть служебный счет.";
 		header("Location: ../operwork.php#close_account");
 		return;
@@ -12,7 +14,19 @@
 	$mysqli = get_sql_connection();
 		
 	$mysqli->query("BEGIN");
-        $res = close_account($_POST["accountnum"]);
+	
+	$stmt = $mysqli->prepare("SELECT count(*) FROM credits WHERE curacc = ? AND closedate IS NULL");
+	$stmt->bind_param("s", $accountnum);
+	$stmt->execute();
+	$cnt = $stmt->get_result()->fetch_row()[0];
+	if ($cnt == 1) {
+		$mysqli->query("ROLLBACK");
+		$_SESSION["message-close"] = "Счет не закрыт, т.к. привязан к действующему кредиту.";
+		header("Location: ../operwork.php#close_account");
+		return;
+	}
+
+        $res = close_account($accountnum);
 	
 	if ($res != "") { 
 		$mysqli->query("ROLLBACK");
