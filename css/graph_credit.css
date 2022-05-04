@@ -1,0 +1,33 @@
+.table-container,
+.info-container {
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+.info-container:first-child {
+	margin-top: 0;
+}
+table {
+	//border: 1px black;
+	//border-collapse: collapse;
+	text-align: center;
+	flex-direction: row;
+	margin: auto;
+	border-spacing: 0;
+	border: 1px solid grey;
+}
+table > tr {
+	border: inherit;
+}
+th, td {
+	padding: 10px;
+	border: 0.5px solid grey;
+}
+div > .infcp {
+	text-align: left;
+	margin-left: 5%;
+	margin-right: 5%;
+	line-height: 25px;
+}
+.infcph {
+	text-align: center;
+}

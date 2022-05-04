@@ -1,6 +1,7 @@
 .main-container{
 	display: flex;
 }
+.main-container>.column,
 .main-container>.column1,
 .main-container>.column2{
 	flex-direction: column;
